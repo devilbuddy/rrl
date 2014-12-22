@@ -38,7 +38,7 @@ fn main() {
         }
         p.translate(direction);
 
-        if world.is_valid(&p) { player.position.set(p) }
+        if world.is_walkable(&p) { player.position.set(p) }
 
         //println!("Pressed key: {}", key_code);
     }

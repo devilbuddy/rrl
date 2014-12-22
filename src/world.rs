@@ -22,6 +22,13 @@ impl Cell {
 			CellType::Floor => '.'
 		}
 	}
+
+	pub fn is_walkable(&self) -> bool {
+		match self.cell_type {
+			CellType::Floor => { return true; },
+			_ => { return false; }
+		}
+	}
 }
 
 pub struct World {
@@ -50,7 +57,7 @@ impl World {
 		for x in range (0, self.height) {
 			for y in range (0, self.width) {
 				let cell = self.grid.index_mut(&x).index_mut(&y);
-				if rand::random() {
+				if rand::random::<uint>() % 5 == 0 {
 					cell.cell_type = CellType::Wall;
 				} else {
 					cell.cell_type = CellType::Floor;
@@ -61,6 +68,10 @@ impl World {
 
 	pub fn is_valid(&self, p: &Point) -> bool {
 		return p.x < self.width && p.y < self.height;
+	}
+
+	pub fn is_walkable(&self, p: &Point) -> bool {
+		return self.is_valid(p) && self.get_cell(p.x, p.y).is_walkable();
 	}
 
 	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
