@@ -1,0 +1,12 @@
+[root]
+name = "rrl"
+version = "0.0.1"
+dependencies = [
+ "tcod 0.3.0 (git+https://github.com/tomassedovic/tcod-rs.git)",
+]
+
+[[package]]
+name = "tcod"
+version = "0.3.0"
+source = "git+https://github.com/tomassedovic/tcod-rs.git#c116f4c0f271d8dff816d06e960eaee5af6a15e6"
+

@@ -1,0 +1,9 @@
+[package]
+
+name = "rrl"
+version = "0.0.1"
+authors = ["devilbuddy <devilbuddy@gmail.com>"]
+build = "./build.sh"
+
+[dependencies.tcod]
+git = "https://github.com/tomassedovic/tcod-rs.git"

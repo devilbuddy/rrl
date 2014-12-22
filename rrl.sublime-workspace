@@ -1,0 +1,279 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pr",
+				"println"
+			],
+			[
+				"ma",
+				"match	match … { … }"
+			],
+			[
+				"ad",
+				"add_three"
+			],
+			[
+				"te",
+				"testing"
+			],
+			[
+				"O",
+				"Ordering"
+			],
+			[
+				"a",
+				"add_one"
+			],
+			[
+				"print",
+				"print_sum"
+			],
+			[
+				"pri",
+				"print_number"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 308.0,
+		"selected_items":
+		[
+			[
+				"pa",
+				"Package Control: Install Package"
+			],
+			[
+				"a",
+				"About"
+			],
+			[
+				"Packa",
+				"Preferences: Browse Packages"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/magnus/dev/rust/rrl"
+	],
+	"file_history":
+	[
+		"/home/magnus/dev/rust/testing/tests/lib.rs",
+		"/home/magnus/dev/rust/testing/src/lib.rs",
+		"/home/magnus/dev/rust/testing/src/main.rs",
+		"/home/magnus/dev/rust/rusttest/src/main.rs",
+		"/home/magnus/dev/rust/guessing_game/src/main.rs",
+		"/home/magnus/dev/rust/modules/src/main.rs",
+		"/home/magnus/dev/rusttest/src/main.rs",
+		"/home/magnus/dev/rusttest/main.rs",
+		"/home/magnus/dev/rusttest/Cargo.toml",
+		"/home/magnus/Downloads/exported.obj",
+		"/home/magnus/dev/smania/android/assets/level.json",
+		"/home/magnus/Desktop/exported.dae",
+		"/home/magnus/Downloads/[kickass.so]berÃfttelsen.om.narnia.hÃfxan.och.lejonet.2005.swedish.dvdrip.xv.torrent",
+		"/home/magnus/Desktop/ship.dae",
+		"/home/magnus/Downloads/TTS_140812-2/run_384x704_windowed.sh",
+		"/home/magnus/Downloads/exported.obj.mtl",
+		"/home/magnus/Desktop/openelec/factory_update_param.aml",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/Entity.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/Bullet.java",
+		"/home/magnus/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
+		"/home/magnus/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/magnus/dev/qrl/qrl/src/com/dg/qrl/QrlGame.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/MessageBoxInput.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/Map.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/LevelController.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/GameScreen.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/Player.java",
+		"/home/magnus/svn/droidgnome/mvania/src/info/u250/c2d/graphic/ParallaxBackground.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/GameScreenRenderer.java",
+		"/home/magnus/svn/droidgnome/mvania/src/com/dg/mvania/EditorDesktopApp.java",
+		"/home/magnus/dev/qrl/qrl/src/com/dg/qrl/MapManager.java",
+		"/home/magnus/dev/qrl/qrl/src/com/dg/qrl/Assets.java",
+		"/home/magnus/dev/qrl/qrl/src/com/dg/qrl/World.java",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/levels/CityBossLevel.java",
+		"/home/magnus/Downloads/kenney/Base pack/Player/p1_walk/p1_walk.json",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/actors/Actor.java",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/actors/hero/Hero.java",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/Preferences.java",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/actors/mobs/DM300.java",
+		"/home/magnus/dev/pixel-dungeon/src/com/watabou/pixeldungeon/actors/mobs/Rat.java",
+		"/home/magnus/dev/android-studio/bin/studio.sh"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"\\h",
+			"_+",
+			"\\s",
+			"    ",
+			"  ",
+			"2",
+			"0",
+			"1",
+			"  ",
+			",",
+			"3",
+			"snapCamera",
+			"parallaxBackground",
+			"parallax",
+			"virtualWidth",
+			"accumulator",
+			"tools"
+		],
+		"highlight": false,
+		"in_selection": true,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"",
+			"_",
+			"",
+			"=",
+			"-",
+			"·",
+			".",
+			"#",
+			"",
+			" ",
+			"",
+			"1"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 160.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "rrl.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 303.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
