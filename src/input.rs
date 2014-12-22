@@ -1,6 +1,6 @@
 extern crate tcod;
 
-use tcod::{Console, KeyState};
+use tcod::{Console};
 
 pub enum KeyCode {
     // Arrow keys

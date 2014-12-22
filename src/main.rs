@@ -12,7 +12,7 @@ fn main() {
 	let w = 80;
 	let h = 50;
 
-	let player = actor::Actor::new('@');
+	let mut player = actor::Actor::new('@');
 	let mut world = world::World::new(w, h);
 	world.generate();
 
@@ -25,10 +25,17 @@ fn main() {
 		renderer.flush();
         
         let key_code = input::wait_for_keypress();
+        let mut direction = util::Direction::None;
+
         match key_code {
-        	input::KeyCode::Up => {println!("UP")},
+        	input::KeyCode::Up => { direction = util::Direction::N },
+        	input::KeyCode::Down => { direction = util::Direction::S },
+        	input::KeyCode::Left => { direction = util::Direction::W },
+        	input::KeyCode::Right => { direction = util::Direction::E },
         	_ => {}
         }
+        player.position.translate(direction);
+
         //println!("Pressed key: {}", key_code);
     }
 }
