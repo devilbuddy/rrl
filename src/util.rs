@@ -1,3 +1,5 @@
+extern crate tcod;
+
 pub enum Direction {
 	North,
 	NorthEast,
@@ -51,5 +53,20 @@ pub struct Rect {
 impl Rect {
 	pub fn new(x: uint, y: uint, width: uint, height:uint) -> Rect {
 		Rect {x: x, y: y, width: width, height: height}
+	}
+}
+
+pub struct Color {
+	r: u8,
+	g: u8,
+	b: u8
+}
+
+impl Color {
+	pub fn red() -> Color { Color {r:255, g: 0, b: 0} }
+	pub fn black() -> Color { Color {r:0, g: 0, b: 0} }
+
+	pub fn to_tcod_color(&self) -> tcod::Color {
+		tcod::Color::new(self.r, self.g, self.b)
 	}
 }

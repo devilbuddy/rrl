@@ -10,8 +10,8 @@ pub struct Renderer {
 
 impl Renderer {
 
-	pub fn new(width: uint, height: uint) -> Renderer {
-		Renderer {con: Console::init_root(width as int, height as int, "rust-rl", false)}
+	pub fn new(width: uint, height: uint, title: &str) -> Renderer {
+		Renderer {con: Console::init_root(width as int, height as int, title, false)}
 	}
 
 	pub fn draw_world(&mut self, world: &World) {
@@ -24,10 +24,11 @@ impl Renderer {
 	}
 
 	pub fn draw_actor(&mut self, actor: &Actor) {
-		self.con.put_char(actor.position.x as int, actor.position.y as int, actor.glyph, BackgroundFlag::Set);
+		self.con.put_char_ex(actor.position.x as int, actor.position.y as int, actor.glyph, tcod::Color::new(240, 13, 20), tcod::Color::new(0, 0, 0));
 	}
 	
 	pub fn flush(&self) {
 		Console::flush();
 	}
+
 }

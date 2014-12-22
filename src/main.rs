@@ -12,11 +12,11 @@ fn main() {
 	let w = 80;
 	let h = 50;
 
-	let mut player = actor::Actor::new('@');
+	let mut player = actor::Actor::new('@', util::Color::red());
 	let mut world = world::World::new(w, h);
 	world.generate();
 
-	let mut renderer = renderer::Renderer::new(w, h);
+	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   
     while !Console::window_closed() {
 
