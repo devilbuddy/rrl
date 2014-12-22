@@ -42,16 +42,18 @@ impl World {
 			cols.push(rows);
 		}
 
+
 		World {width: width, height: height, grid: cols}
 	} 
 
 	pub fn generate(&mut self) {
 		for x in range (0, self.height) {
 			for y in range (0, self.width) {
+				let cell = self.grid.index_mut(&x).index_mut(&y);
 				if(rand::random()) {
-					self.grid[x][y].cell_type = CellType::Wall;
+					cell.cell_type = CellType::Wall;
 				} else {
-					self.grid[x][y].cell_type = CellType::Floor;
+					cell.cell_type = CellType::Floor;
 				}
 			}
 		}
