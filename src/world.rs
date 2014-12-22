@@ -59,6 +59,10 @@ impl World {
 		}
 	}
 
+	pub fn is_valid(&self, p: &Point) -> bool {
+		return p.x >= 0 && p.x < self.width && p.y >= 0 && p.y < self.height;
+	}
+
 	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
 		&self.grid[y][x]
 	}

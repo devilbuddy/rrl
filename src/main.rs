@@ -27,14 +27,18 @@ fn main() {
         let key_code = input::wait_for_keypress();
         let mut direction = util::Direction::None;
 
+        let mut p = util::Point::new(player.position.x, player.position.y);
+
         match key_code {
-        	input::KeyCode::Up => { direction = util::Direction::N },
-        	input::KeyCode::Down => { direction = util::Direction::S },
-        	input::KeyCode::Left => { direction = util::Direction::W },
-        	input::KeyCode::Right => { direction = util::Direction::E },
+        	input::KeyCode::Up => { direction = util::Direction::North },
+        	input::KeyCode::Down => { direction = util::Direction::South },
+        	input::KeyCode::Left => { direction = util::Direction::West },
+        	input::KeyCode::Right => { direction = util::Direction::East },
         	_ => {}
         }
-        player.position.translate(direction);
+        p.translate(direction);
+
+        if world.is_valid(&p) { player.position.set(p) }
 
         //println!("Pressed key: {}", key_code);
     }

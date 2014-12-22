@@ -1,12 +1,13 @@
 pub enum Direction {
-	N,
-	NE,
-	E,
-	SE,
-	S,
-	SW,
-	W,
-	NW,
+	North,
+	NorthEast,
+	East,
+	SouthEast,
+	South,
+	SouthWest,
+	West,
+	NorthWest,
+
 	None
 }
 
@@ -22,16 +23,21 @@ impl Point {
 
 	pub fn translate(&mut self, direction: Direction) {
 		match direction {
-			Direction::N => { self.y -= 1 },
-			Direction::NE => { self.x += 1; self.y -=1 },
-			Direction::E => { self.x += 1 },
-			Direction::SE => { self.x += 1; self.y += 1 },
-			Direction::S => { self.y += 1 },
-			Direction::SW => { self.x -= 1; self.y += 1 },
-			Direction::W => { self.x -= 1 },
-			Direction::NW => { self.x -= 1; self.y -= 1 },
+			Direction::North => { self.y -= 1 },
+			Direction::NorthEast => { self.x += 1; self.y -=1 },
+			Direction::East => { self.x += 1 },
+			Direction::SouthEast => { self.x += 1; self.y += 1 },
+			Direction::South => { self.y += 1 },
+			Direction::SouthWest => { self.x -= 1; self.y += 1 },
+			Direction::West => { self.x -= 1 },
+			Direction::NorthWest => { self.x -= 1; self.y -= 1 },
 			_ => {}
 		}
+	}
+
+	pub fn set(&mut self, p : Point) {
+		self.x = p.x;
+		self.y = p.y;
 	}
 }	
 
