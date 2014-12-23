@@ -8,5 +8,5 @@ dependencies = [
 [[package]]
 name = "tcod"
 version = "0.3.0"
-source = "git+https://github.com/tomassedovic/tcod-rs.git#c116f4c0f271d8dff816d06e960eaee5af6a15e6"
+source = "git+https://github.com/tomassedovic/tcod-rs.git#bfe497d692d4bbb9b109a84547c8948ad0aeb7ab"
 

@@ -1,6 +1,8 @@
+extern crate core;
+
 use util::Point;
 use std::rand;
-use std::vec;
+use std::num::SignedInt;
 
 #[deriving(PartialEq)]
 enum CellType {
@@ -39,10 +41,6 @@ pub struct World {
 	pub start: Point
 }
 
-struct Temp {
-    size: uint
-}
-
 impl World {
 	pub fn new(width: uint, height: uint) -> World {
 
@@ -59,22 +57,11 @@ impl World {
 		World {width: width, height: height, grid: cols, start: Point::new(0,0)}
 	} 
 
-//	pub fn generate(&mut self) {
-//		for y in range (0, self.height) {
-//			for x in range (0, self.width) {
-//				let cell = self.grid.index_mut(&y).index_mut(&x);
-//				if rand::random::<uint>() % 5 == 0 {
-//					cell.cell_type = CellType::Wall;
-//				} else {
-//					cell.cell_type = CellType::Floor;
-//				}
-//			}
-//		}
-//	}
-
 	pub fn generate_cellular_automata(&mut self) {
+		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
+
 		let fill_prob = 40;
-		let generations = 1u;
+		let generations = 5u;
 		let r1_cutoff = 5u;
 		let r2_cutoff = 2u;
 
@@ -101,33 +88,27 @@ impl World {
 		}
 
 		for _ in range (0, generations) {
-			print!("generation\n");
-			for y in range (1, self.height - 1) {
-				for x in range (1, self.width - 1) {
-					print!("loop x:{} y:{}\n", x, y);
+			for y in range (1i, self.height as int - 1) {
+				for x in range (1i, self.width as int - 1) {
 					
 					let mut adjacent_count_r1 = 0u;
 					let mut adjacent_count_r2 = 0u;
 					
+					// the number of tiles within 1 step of p which are walls
 					for yy in range (-1i, 2) {
 						for xx in range (-1i, 2) {
-							let yyy = y as int + yy;
-							let xxx = x as int + xx;
-							print!("{}-{}", yyy, xxx);
+							let yyy = y + yy;
+							let xxx = x + xx;
 							if grid[yyy as uint][xxx as uint] == 1 {
 							 	adjacent_count_r1 += 1; 
-							 	print!("foo");
 							} 	
 						}
 					}
-					let y_as_int = y as int;
-					let x_as_int = x as int;
-					for yy in range (y_as_int - 2i, y_as_int + 3) {
-						for xx in range (x_as_int -2i, x_as_int + 3) {
-							let dy = yy - y_as_int;
-							let dx = xx - x_as_int;
-
-							if (dx == 2 || dx == -2) && (dy == 2 || dy == -2) {
+					// p is in the middle of an open space
+					for yy in range (y - 2i, y + 3) {
+						for xx in range (x -2i, x + 3) {
+							
+							if (xx - x).abs() == 2 && (yy - y).abs() == 2 {
 								continue;
 							}
 							let p = Point::new(xx as uint , yy as uint);
@@ -141,12 +122,10 @@ impl World {
 						}
 					}
 
-					//print!("x:{} y:{} - adjacent_count_r1 {}\n", x, y, adjacent_count_r1);
 					if adjacent_count_r1 >= r1_cutoff || adjacent_count_r2 <= r2_cutoff {
-					//if adjacent_count_r1 >= r1_cutoff {
-						grid2[y][x] = 1;
+						grid2[y as uint][x as uint] = 1;
 					} else {
-						grid2[y][x] = 0;
+						grid2[y as uint][x as uint] = 0;
 					}
 				}
 			}
@@ -169,13 +148,12 @@ impl World {
 				match grid[y][x] {
 					1 => { cell.cell_type = CellType::Wall },
 					_ => { cell.cell_type = CellType::Floor; floors.push(Point::new(x,y)) },
-				}
-				
+				}	
 			}
 		}
 		
-		let mut index = rand::random::<uint>();
-		index = index % floors.len();
+		// random start positon
+		let index = rand::random::<uint>() % floors.len();
 		self.start.x = floors[index].x;
 		self.start.y = floors[index].y;
 	}

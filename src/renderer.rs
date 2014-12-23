@@ -24,7 +24,7 @@ impl Renderer {
 	}
 
 	pub fn draw_actor(&mut self, actor: &Actor) {
-		self.con.put_char_ex(actor.position.x as int, actor.position.y as int, actor.glyph, tcod::Color::new(240, 13, 20), tcod::Color::new(0, 0, 0));
+		self.con.put_char_ex(actor.position.x as int, actor.position.y as int, actor.glyph, actor.color.to_tcod_color(), tcod::Color::new(0, 0, 0));
 	}
 	
 	pub fn flush(&self) {
