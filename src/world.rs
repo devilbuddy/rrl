@@ -8,12 +8,11 @@ enum CellType {
 
 struct Cell {
 	cell_type : CellType,
-	position : Point
 }
 
 impl Cell {
-	fn new(x: uint, y: uint, cell_type: CellType) -> Cell {
-		Cell {cell_type: cell_type, position: Point::new(x, y)}
+	fn new(cell_type: CellType) -> Cell {
+		Cell {cell_type: cell_type}
 	}
 
 	pub fn get_glyph(&self) -> char {
@@ -37,18 +36,22 @@ pub struct World {
 	grid: Vec<Vec<Cell>>,
 }
 
+struct Temp {
+    size: uint
+}
+
 impl World {
 	pub fn new(width: uint, height: uint) -> World {
 
 		let mut cols:Vec<Vec<Cell>> = Vec::with_capacity(width);
-		for x in range (0, height) {
+
+		for _ in range (0, height) {
 			let mut rows:Vec<Cell> = Vec::with_capacity(height);
-			for y in range (0, width) {
-				rows.push(Cell::new(x, y, CellType::Floor));
+			for _ in range (0, width) {
+				rows.push(Cell::new(CellType::Floor));
 			}
 			cols.push(rows);
 		}
-
 
 		World {width: width, height: height, grid: cols}
 	} 

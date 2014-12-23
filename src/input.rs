@@ -19,12 +19,17 @@ pub enum KeyCode {
 pub fn wait_for_keypress()-> KeyCode {
     let key_state = Console::wait_for_keypress(true);
 
-    match key_state.key {
-        self::tcod::Key::Special(tcod::KeyCode::Up)     => KeyCode::Up,
-        self::tcod::Key::Special(tcod::KeyCode::Down)   => KeyCode::Down,
-        self::tcod::Key::Special(tcod::KeyCode::Left)   => KeyCode::Left,
-        self::tcod::Key::Special(tcod::KeyCode::Right)  => KeyCode::Right,
-        self::tcod::Key::Special(tcod::KeyCode::Escape) => KeyCode::Escape,
-        _                                               => KeyCode::None
+    if key_state.pressed {
+        match key_state.key {
+            self::tcod::Key::Special(tcod::KeyCode::Up)     => KeyCode::Up,
+            self::tcod::Key::Special(tcod::KeyCode::Down)   => KeyCode::Down,
+            self::tcod::Key::Special(tcod::KeyCode::Left)   => KeyCode::Left,
+            self::tcod::Key::Special(tcod::KeyCode::Right)  => KeyCode::Right,
+            self::tcod::Key::Special(tcod::KeyCode::Escape) => KeyCode::Escape,
+            _                                               => KeyCode::None
+        }    
+    } else {
+        KeyCode::None
     }
+    
 }
