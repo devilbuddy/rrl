@@ -14,7 +14,9 @@ fn main() {
 
 	let mut player = actor::Actor::new('@', util::Color::red());
 	let mut world = world::World::new(w, h);
-	world.generate();
+	world.generate_cellular_automata();
+	player.position.x = world.start.x;
+	player.position.y = world.start.y;
 
 	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   
