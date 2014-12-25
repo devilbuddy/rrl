@@ -68,6 +68,8 @@ impl World {
 	pub fn generate(&mut self) {
 		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
 
+		self.actors.clear();
+
 		let fill_prob = 40;
 		let generations = 5u;
 		let r1_cutoff = 5u;

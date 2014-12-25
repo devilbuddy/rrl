@@ -8,6 +8,11 @@ pub struct Actor {
 }
 
 impl Actor {
+
+	pub fn player() -> Actor {
+		Actor { position: Point::new(0,0), glyph: '@', color: Color::red() }		
+	}
+
 	pub fn new(glyph : char, color: Color) -> Actor {
 		Actor { position: Point::new(0,0), glyph: glyph, color: color }
 	}

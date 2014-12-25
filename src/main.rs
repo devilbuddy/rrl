@@ -12,7 +12,7 @@ fn main() {
 	let w = 80;
 	let h = 50;
 
-	let mut player = actor::Actor::new('@', util::Color::red());
+	let mut player = actor::Actor::player();
 	let mut world = world::World::new(w, h);
 	world.generate();
 	player.position.set(util::Point {x: world.start.x, y: world.start.y});

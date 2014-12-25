@@ -19,7 +19,7 @@ impl Panel {
 		con.set_default_background(background_color.to_tcod_color());
 		con.set_default_foreground(foreground_color.to_tcod_color());
 		con.clear();
-		Panel {x: y, y: y, width: width, height: height, con: con}
+		Panel {x: x, y: y, width: width, height: height, con: con}
 	}
 }
 
