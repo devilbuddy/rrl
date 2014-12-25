@@ -14,9 +14,9 @@ fn main() {
 
 	let mut player = actor::Actor::new('@', util::Color::red());
 	let mut world = world::World::new(w, h);
-	world.generate_cellular_automata();
+	world.generate();
 	player.position.x = world.start.x;
-	player.position.y = world.start.y;
+	player.position.y = world.start.x;
 
 	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   
@@ -36,6 +36,11 @@ fn main() {
         	input::KeyCode::Down => { direction = util::Direction::South },
         	input::KeyCode::Left => { direction = util::Direction::West },
         	input::KeyCode::Right => { direction = util::Direction::East },
+        	input::KeyCode::Escape => { 
+        		world.generate();
+				player.position.x = world.start.x;
+				player.position.y = world.start.x;
+        	},
         	_ => {}
         }
         p.translate(direction);

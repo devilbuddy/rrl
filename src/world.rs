@@ -57,7 +57,7 @@ impl World {
 		World {width: width, height: height, grid: cols, start: Point::new(0,0)}
 	} 
 
-	pub fn generate_cellular_automata(&mut self) {
+	pub fn generate(&mut self) {
 		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
 
 		let fill_prob = 40;
@@ -108,17 +108,16 @@ impl World {
 					for yy in range (y - 2i, y + 3) {
 						for xx in range (x -2i, x + 3) {
 							
+							// skip p itself
 							if (xx - x).abs() == 2 && (yy - y).abs() == 2 {
 								continue;
 							}
-							let p = Point::new(xx as uint , yy as uint);
-							if !self.is_valid(&p) {
-								continue;
+							
+							if xx >= 0 && xx < self.width as int && yy >= 0 && yy < self.height as int {
+								if grid[yy as uint][xx as uint] == 1 {
+									adjacent_count_r2 += 1;
+								}
 							}
-							if grid[yy as uint ][xx as uint] == 1 {
-								adjacent_count_r2 += 1;
-							}
-
 						}
 					}
 
@@ -132,14 +131,12 @@ impl World {
 
 			for y in range (0, self.height) {
 				for x in range (0, self.width) {
-					match grid2[y][x] {
-						1 => { grid[y][x] = 1 },
-						_ => { grid[y][x] = 0 },
-					}
+					grid[y][x] = grid2[y][x];
 				}
 			}
 		}
 
+		// all floor tiles
 		let mut floors : Vec<Point> = Vec::new();
 
 		for y in range (0, self.height) {

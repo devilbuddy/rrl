@@ -64,6 +64,8 @@ pub struct Color {
 
 impl Color {
 	pub fn red() -> Color { Color {r:255, g: 0, b: 0} }
+	pub fn green() -> Color { Color {r:0, g: 255, b: 0} }
+	pub fn blue() -> Color { Color {r:0, g: 0, b: 255} }
 	pub fn black() -> Color { Color {r:0, g: 0, b: 0} }
 
 	pub fn to_tcod_color(&self) -> tcod::Color {
