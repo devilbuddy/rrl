@@ -10,5 +10,10 @@ pub struct Actor {
 impl Actor {
 	pub fn new(glyph : char, color: Color) -> Actor {
 		Actor { position: Point::new(0,0), glyph: glyph, color: color }
-	}	
+	}
+
+	pub fn set_position(&mut self, position: Point) {
+		self.position.x = position.x;
+		self.position.y = position.y;
+	}
 }

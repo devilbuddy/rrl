@@ -1,6 +1,9 @@
 extern crate core;
 
 use util::Point;
+use util::Color;
+use actor::Actor;
+
 use std::rand;
 use std::num::SignedInt;
 
@@ -38,7 +41,8 @@ pub struct World {
 	pub width: uint,
 	pub height: uint,
 	grid: Vec<Vec<Cell>>,
-	pub start: Point
+	pub start: Point,
+	pub actors: Vec<Box<Actor>>,
 }
 
 impl World {
@@ -54,8 +58,12 @@ impl World {
 			cols.push(rows);
 		}
 
-		World {width: width, height: height, grid: cols, start: Point::new(0,0)}
+		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: Vec::new()}
 	} 
+
+	pub fn add_actor(&mut self, actor: Box<Actor>) {
+		self.actors.push(actor);
+	}
 
 	pub fn generate(&mut self) {
 		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
@@ -153,6 +161,19 @@ impl World {
 		let index = rand::random::<uint>() % floors.len();
 		self.start.x = floors[index].x;
 		self.start.y = floors[index].y;
+		floors.remove(index);
+
+		let enemies_count = 10u;
+		for _ in range(0, enemies_count) {
+			let index = rand::random::<uint>() % floors.len();
+			
+			let mut actor = box Actor::new('k', Color::green());
+			actor.set_position(Point{x: floors[index].x, y: floors[index].y});
+			self.add_actor(actor);
+
+			floors.remove(index);			
+		}
+
 	}
 
 	pub fn is_valid(&self, p: &Point) -> bool {

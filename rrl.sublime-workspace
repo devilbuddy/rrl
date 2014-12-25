@@ -4,6 +4,158 @@
 		"selected_items":
 		[
 			[
+				"de",
+				"dest_y"
+			],
+			[
+				"des",
+				"dest_x"
+			],
+			[
+				"y",
+				"y_offset"
+			],
+			[
+				"t",
+				"top_panel"
+			],
+			[
+				"top",
+				"top_panel_height"
+			],
+			[
+				"C",
+				"Color"
+			],
+			[
+				"gr",
+				"grid2"
+			],
+			[
+				"st",
+				"std"
+			],
+			[
+				"use",
+				"user_closure"
+			],
+			[
+				"c",
+				"callback"
+			],
+			[
+				"in",
+				"index"
+			],
+			[
+				"r",
+				"random"
+			],
+			[
+				"ra",
+				"rand"
+			],
+			[
+				"a",
+				"adjacent_count_r1"
+			],
+			[
+				"ro",
+				"rows2"
+			],
+			[
+				"s",
+				"std"
+			],
+			[
+				"con",
+				"continue"
+			],
+			[
+				"p",
+				"push"
+			],
+			[
+				"cell",
+				"cell_type"
+			],
+			[
+				"k",
+				"key_state"
+			],
+			[
+				"tmp",
+				"tmp_h"
+			],
+			[
+				"w",
+				"width"
+			],
+			[
+				"is",
+				"is_walkable"
+			],
+			[
+				"CE",
+				"CellType"
+			],
+			[
+				"co",
+				"color"
+			],
+			[
+				"tr",
+				"translate_color"
+			],
+			[
+				"S",
+				"struct"
+			],
+			[
+				"e",
+				"enum	enum … { … }"
+			],
+			[
+				"d",
+				"direction"
+			],
+			[
+				"ce",
+				"cell_type"
+			],
+			[
+				"ke",
+				"key_code"
+			],
+			[
+				"W",
+				"Wall"
+			],
+			[
+				"Ce",
+				"CellType"
+			],
+			[
+				"f",
+				"for	for … { … }"
+			],
+			[
+				"h",
+				"height"
+			],
+			[
+				"Cell",
+				"Cell"
+			],
+			[
+				"i",
+				"i32"
+			],
+			[
+				"u",
+				"util"
+			],
+			[
 				"pr",
 				"println"
 			],
@@ -24,10 +176,6 @@
 				"Ordering"
 			],
 			[
-				"a",
-				"add_one"
-			],
-			[
 				"print",
 				"print_sum"
 			],
@@ -39,6 +187,81 @@
 	},
 	"buffers":
 	[
+		{
+			"contents": "extern crate tcod;\nuse tcod::{Console};\n\nmod util;\nmod actor;\nmod world;\nmod renderer;\nmod input;\n\nfn main() {\n\n	let w = 80;\n	let h = 50;\n\n	let mut player = actor::Actor::new('', util::Color::red());\n	let mut world = world::World::new(w, h);\n	world.generate();\n	player.position.x = world.start.x;\n	player.position.y = world.start.x;\n\n	let mut renderer = renderer::Renderer::new(w, h, \"rust-rl\");\n  \n    while !Console::window_closed() {\n\n    	renderer.draw_world(&world);\n		renderer.draw_actor(&player);\n		renderer.flush();\n        \n        let key_code = input::wait_for_keypress();\n        let mut direction = util::Direction::None;\n\n        let mut p = util::Point::new(player.position.x, player.position.y);\n\n        match key_code {\n        	input::KeyCode::Up => { direction = util::Direction::North },\n        	input::KeyCode::Down => { direction = util::Direction::South },\n        	input::KeyCode::Left => { direction = util::Direction::West },\n        	input::KeyCode::Right => { direction = util::Direction::East },\n        	input::KeyCode::Escape => { \n        		world.generate();\n				player.position.x = world.start.x;\n				player.position.y = world.start.x;\n        	},\n        	_ => {}\n        }\n        p.translate(direction);\n\n        if world.is_walkable(&p) { player.position.set(p) }\n\n        //println!(\"Pressed key: {}\", key_code);\n    }\n}",
+			"file": "src/main.rs",
+			"file_size": 1362,
+			"file_write_time": 130639792731893495,
+			"settings":
+			{
+				"buffer_size": 1360,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/util.rs",
+			"settings":
+			{
+				"buffer_size": 1415,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/world.rs",
+			"settings":
+			{
+				"buffer_size": 3972,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/input.rs",
+			"settings":
+			{
+				"buffer_size": 855,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/renderer.rs",
+			"settings":
+			{
+				"buffer_size": 1928,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/actor.rs",
+			"settings":
+			{
+				"buffer_size": 262,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 36,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/magnus/dev/rust/tcod-rs/src/lib.rs",
+			"settings":
+			{
+				"buffer_size": 34162,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Cargo.toml",
+			"settings":
+			{
+				"buffer_size": 184,
+				"line_ending": "Unix"
+			}
+		}
 	],
 	"build_system": "",
 	"command_palette":
@@ -80,15 +303,25 @@
 	},
 	"expanded_folders":
 	[
-		"/home/magnus/dev/rust/rrl"
+		"/home/magnus/dev/rust/rrl",
+		"/home/magnus/dev/rust/rrl/src",
+		"/home/magnus/dev/rust/tcod-rs",
+		"/home/magnus/dev/rust/tcod-rs/src"
 	],
 	"file_history":
 	[
+		"/home/magnus/dev/rust/rrl/src/renderer.rs",
+		"/home/magnus/dev/rust/tcod-rs/src/lib.rs",
+		"/home/magnus/dev/rust/tcod-rs/src/ffi.rs",
+		"/home/magnus/dev/rust/rrl/src/util.rs",
+		"/home/magnus/dev/rust/rrl/src/world.rs",
+		"/home/magnus/dev/rust/rrl/src/map.rs",
+		"/home/magnus/dev/rust/rrl/target/.fingerprint/tcod-d8dc5e12af0ea327/dep-lib-tcod",
+		"/home/magnus/dev/rust/guessing_game/src/main.rs",
 		"/home/magnus/dev/rust/testing/tests/lib.rs",
 		"/home/magnus/dev/rust/testing/src/lib.rs",
 		"/home/magnus/dev/rust/testing/src/main.rs",
 		"/home/magnus/dev/rust/rusttest/src/main.rs",
-		"/home/magnus/dev/rust/guessing_game/src/main.rs",
 		"/home/magnus/dev/rust/modules/src/main.rs",
 		"/home/magnus/dev/rusttest/src/main.rs",
 		"/home/magnus/dev/rusttest/main.rs",
@@ -128,7 +361,7 @@
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -143,6 +376,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Escape",
+			"abs",
+			"c_path_callback",
+			"TCOD_path_t",
+			"TCOD_path_new_using_function",
 			"\\h",
 			"_+",
 			"\\s",
@@ -162,7 +400,7 @@
 			"tools"
 		],
 		"highlight": false,
-		"in_selection": true,
+		"in_selection": false,
 		"preserve_case": false,
 		"regex": true,
 		"replace_history":
@@ -189,6 +427,277 @@
 	"groups":
 	[
 		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "src/main.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1360,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								176,
+								176
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/util.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1415,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1263,
+								1263
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 663.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/world.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3972,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1034,
+								1034
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 561.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/input.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 855,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								715,
+								715
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/renderer.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1928,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								609,
+								609
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 408.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"file": "terminal.png",
+					"semi_transient": false,
+					"stack_index": 2,
+					"type": "image"
+				},
+				{
+					"buffer": 5,
+					"file": "src/actor.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 262,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								17,
+								17
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": ".gitignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 36,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								22,
+								22
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/home/magnus/dev/rust/tcod-rs/src/lib.rs",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 34162,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15263,
+								15263
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rust/Rust.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7909.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "Cargo.toml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 184,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								184,
+								184
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				}
+			]
+		},
+		{
 			"sheets":
 			[
 			]
@@ -211,6 +720,12 @@
 				0,
 				1,
 				1
+			],
+			[
+				0,
+				1,
+				1,
+				2
 			]
 		],
 		"cols":
@@ -221,13 +736,14 @@
 		"rows":
 		[
 			0.0,
+			0.5,
 			1.0
 		]
 	},
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 160.0
+		"height": 287.0
 	},
 	"output.find_results":
 	{
@@ -263,7 +779,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 0,
+	"selected_group": 1,
 	"settings":
 	{
 	},

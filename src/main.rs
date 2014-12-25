@@ -15,8 +15,7 @@ fn main() {
 	let mut player = actor::Actor::new('@', util::Color::red());
 	let mut world = world::World::new(w, h);
 	world.generate();
-	player.position.x = world.start.x;
-	player.position.y = world.start.x;
+	player.position.set(util::Point {x: world.start.x, y: world.start.y});
 
 	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   
@@ -29,7 +28,6 @@ fn main() {
         let key_code = input::wait_for_keypress();
         let mut direction = util::Direction::None;
 
-        let mut p = util::Point::new(player.position.x, player.position.y);
 
         match key_code {
         	input::KeyCode::Up => { direction = util::Direction::North },
@@ -38,13 +36,14 @@ fn main() {
         	input::KeyCode::Right => { direction = util::Direction::East },
         	input::KeyCode::Escape => { 
         		world.generate();
-				player.position.x = world.start.x;
-				player.position.y = world.start.x;
+        		player.position.set(util::Point {x: world.start.x, y: world.start.y});
         	},
         	_ => {}
         }
-        p.translate(direction);
 
+        // move
+		let mut p = util::Point::new(player.position.x, player.position.y);
+		p.translate(direction);
         if world.is_walkable(&p) { player.position.set(p) }
 
         //println!("Pressed key: {}", key_code);

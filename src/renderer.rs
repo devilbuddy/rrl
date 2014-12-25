@@ -6,18 +6,20 @@ use world::World;
 use util;
 
 pub struct Panel {
+	x: uint,
+	y: uint,
 	width: uint,
 	height: uint,
     con: Console
 }
 
 impl Panel {
-	pub fn new(x: int, y: int, width: uint, height: uint, background_color: util::Color, foreground_color: util::Color) -> Panel {
+	pub fn new(x: uint, y: uint, width: uint, height: uint, background_color: util::Color, foreground_color: util::Color) -> Panel {
 		let mut con = Console::new(width as int, height as int);
 		con.set_default_background(background_color.to_tcod_color());
 		con.set_default_foreground(foreground_color.to_tcod_color());
 		con.clear();
-		Panel {width: width, height: height, con: con}
+		Panel {x: y, y: y, width: width, height: height, con: con}
 	}
 }
 
@@ -39,7 +41,7 @@ impl Renderer {
 
 	pub fn draw_world(&mut self, world: &World) {
 		Console::blit(&self.top_panel.con, // source console
-						0, 0, self.top_panel.width as int, self.top_panel.height as int, // source 
+						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
 						&mut self.con, // dest console 
 						0, 0, 
 						1f32, 
@@ -56,7 +58,9 @@ impl Renderer {
 			}
 		}
 		
-		
+		for actor in world.actors.iter() {
+			self.draw_actor(&**actor);
+		}
 	}
 
 	pub fn draw_actor(&mut self, actor: &Actor) {
