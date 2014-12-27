@@ -84,6 +84,23 @@ impl Brain for MonsterBrain {
 	}
 }
 
+struct GeneratorBrain;
+impl GeneratorBrain {
+	pub fn new() -> GeneratorBrain {
+		GeneratorBrain
+	}
+}
+
+impl Brain for GeneratorBrain {
+	fn think(&self) -> bool {
+		return false;
+	}
+
+	fn act(&self) -> Option<MoveAction> {
+		None
+	}
+}
+
 pub struct Actor {
 	pub position: Point,
     pub glyph : char,
@@ -100,6 +117,10 @@ impl Actor {
 
 	pub fn kobold() -> Actor {
 		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), is_player: false, brain: box MonsterBrain::new()}
+	}
+
+	pub fn kobold_generator() -> Actor {
+		Actor {position: Point::new(0,0), glyph: 'Å', color: Color::purple(), is_player: false, brain: box GeneratorBrain::new()}	
 	}
 
 	pub fn get_position(&self) -> &Point {

@@ -41,7 +41,7 @@ impl Color {
 	pub fn green() -> Color { Color {r:0, g: 255, b: 0} }
 	pub fn blue() -> Color { Color {r:0, g: 0, b: 255} }
 	pub fn black() -> Color { Color {r:0, g: 0, b: 0} }
-
+	pub fn purple() -> Color { Color {r:160, g: 32, b: 240} }
 	pub fn to_tcod_color(&self) -> tcod::Color {
 		tcod::Color::new(self.r, self.g, self.b)
 	}

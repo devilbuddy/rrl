@@ -4,6 +4,7 @@ use tcod::{Console};
 mod util;
 mod actor;
 mod world;
+mod generator;
 mod renderer;
 mod input;
 
@@ -16,7 +17,7 @@ fn main() {
 	let h = 50;
 
 	let mut world = world::World::new(w, h);
-	world.generate();
+	generator::generate(&mut world);
 	
 	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   	renderer.draw_world(&world);
