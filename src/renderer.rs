@@ -1,7 +1,6 @@
 extern crate tcod;
 use tcod::{Console, BackgroundFlag};
 
-use actor::Actor;
 use world::World;
 use util;
 

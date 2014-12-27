@@ -33,27 +33,27 @@ impl PlayerBrain {
 impl Brain for PlayerBrain {
 
 	fn think(&self) -> bool {
-		println!("player think");
 		return true;
 	}
 
 	fn act(&self) -> Option<MoveAction> {
-		println!("before wait");
-		let key_code = input::wait_for_keypress();
-		println!("after wait");
-        let mut direction = Direction::None;
-		match key_code {
-        	input::KeyCode::Up => { direction = Direction::North },
-        	input::KeyCode::Down => { direction = Direction::South },
-        	input::KeyCode::Left => { direction = Direction::West },
-        	input::KeyCode::Right => { direction = Direction::East },
-        	input::KeyCode::Escape => { 
-        		//world.generate();
-        	},
-        	_ => { return None; }
+		let mut direction = Direction::None;
+		match input::check_for_keypress() {
+			Some(key_code) => {
+				match key_code {
+					input::KeyCode::Up => { direction = Direction::North },
+        			input::KeyCode::Down => { direction = Direction::South },
+        			input::KeyCode::Left => { direction = Direction::West },
+        			input::KeyCode::Right => { direction = Direction::East },
+        			_ => {}
+				}
+			},
+			None => {
+				return None;
+			}
         }
 
-		Some(MoveAction{direction: direction})
+		Some(MoveAction::new(direction))
 	}
 }
 

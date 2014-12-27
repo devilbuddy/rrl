@@ -20,12 +20,10 @@ fn main() {
 	
 	let mut renderer = renderer::Renderer::new(w, h, "rust-rl");
   	renderer.draw_world(&world);
-  	
+
     while !Console::window_closed() {
 
     	world.tick();
     	renderer.draw_world(&world);
-		
-        //println!("Pressed key: {}", key_code);
     }
 }

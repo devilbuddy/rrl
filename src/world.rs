@@ -8,6 +8,7 @@ use std::rand;
 use std::num::SignedInt;
 use std::cell::{RefCell};
 use std::rc::{Rc};
+use std::collections::RingBuf;
 
 #[deriving(PartialEq)]
 enum CellType {
@@ -39,17 +40,16 @@ impl Cell {
 	}
 }
 
-
-pub type ActorRef = Rc<RefCell<Actor>>;
+type ActorRef = Rc<RefCell<Actor>>;
 
 pub struct World {
 	pub width: uint,
 	pub height: uint,
 	grid: Vec<Vec<Cell>>,
 	pub start: Point,
-	//pub actors: Vec<Box<Actor + 'a>>,
 	pub actors: Vec<ActorRef>,
-	pub player: Box<ActorRef>
+	pub player: Box<ActorRef>,
+	to_act: RingBuf<ActorRef>
 }
 
 impl World {
@@ -70,7 +70,7 @@ impl World {
 
 		let mut actors = Vec::new();
 		actors.push(player_ref.clone());
-		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: actors, player: box player_ref}
+		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: actors, player: box player_ref, to_act: RingBuf::new()}
 	} 
 
 	// pub fn add_actor(&mut self, actor: Box<Actor + 'a>) {
@@ -88,23 +88,21 @@ impl World {
 
 	pub fn tick(&mut self) {
 
-		println!("world tick");
-
-		let mut to_act : Vec<ActorRef> = Vec::new();
-
-		for actor_ref in self.actors.iter_mut() {
-			let actor = actor_ref.borrow();
-		 	let can_act = actor.brain.think();
-		 	if can_act {
-		 		to_act.push(actor_ref.clone());
-		 	}
+		if self.to_act.is_empty() {
+			for actor_ref in self.actors.iter_mut() {
+				let actor = actor_ref.borrow();
+			 	let can_act = actor.brain.think();
+			 	if can_act {
+			 		self.to_act.push_back(actor_ref.clone());
+			 	}
+			}
 		}
 
-		for mut actor_ref in to_act.iter() {
-			let mut actor = actor_ref.borrow_mut();
-		 	let mut has_acted = false;
-		 	while !has_acted {
-		 		let action = actor.brain.act();
+		let actor_ref_option = self.to_act.pop_front();
+		match actor_ref_option {
+			Some(actor_ref) => {
+				let mut actor = actor_ref.borrow_mut();
+				let action = actor.brain.act();
 		 		match action {
 		 			Some(move_action) => {
 
@@ -113,13 +111,17 @@ impl World {
 						let walkable = self.is_walkable(&p);
 	    				if walkable { 
 	    					actor.set_position(p); 
-	    					has_acted = true;
 	    				}
 		 			},
-		 			None => {}
+		 			None => {
+		 				// no action taken (player)
+		 				self.to_act.push_front(actor_ref.clone());
+		 			}
 		 		}
-		 	}
+			},
+			None => {}
 		}
+		
 	}
 
 	pub fn is_valid(&self, p: &Point) -> bool {
