@@ -38,7 +38,12 @@ impl Cell {
 
 	pub fn is_walkable(&self) -> bool {
 		match self.cell_type {
-			CellType::Floor => { return true; },
+			CellType::Floor => { 
+				match self.actor {
+					Some(_) => { return false; }
+					None => { return true; }
+				}
+			},
 			_ => { return false; }
 		}
 	}
@@ -76,19 +81,6 @@ impl World {
 		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: actors, player: box player_ref, to_act: RingBuf::new()}
 	} 
 
-	// pub fn add_actor(&mut self, actor: Box<Actor + 'a>) {
-	// 	self.actors.push(actor);
-	// }
-
-	//pub fn get_player(&self) -> &Player {
-	//	return &*self.player;
-	//}
-
-	//pub fn get_player_mut(&mut self) -> &mut Player {
-	//	return &mut *self.player;
-	//}
-
-
 	pub fn tick(&mut self) {
 
 		if self.to_act.is_empty() {
@@ -109,11 +101,19 @@ impl World {
 		 		match action {
 		 			Some(move_action) => {
 
-        				let mut p = Point::new(actor.get_position().x, actor.get_position().y);
-						p.translate(move_action.direction);
-						let walkable = self.is_walkable(&p);
+		 				let current_position = Point::new(actor.get_position().x, actor.get_position().y);
+
+        				let mut new_position = Point::new(actor.get_position().x, actor.get_position().y);
+						new_position.translate(move_action.direction);
+						
+						let walkable = self.is_walkable(&new_position);
 	    				if walkable { 
-	    					actor.set_position(p); 
+	    					
+							self.grid[current_position.y][current_position.x].actor = None;
+							
+							
+							self.grid[new_position.y][new_position.x].actor = Some(actor_ref.clone());
+							actor.set_position(new_position);
 	    				}
 		 			},
 		 			None => {
