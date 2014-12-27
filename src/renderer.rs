@@ -1,6 +1,7 @@
 extern crate tcod;
 use tcod::{Console, BackgroundFlag};
 
+use actor::Actor;
 use world::World;
 use util;
 
@@ -58,17 +59,17 @@ impl Renderer {
 		}
 		
 		for actor_ref in world.actors.iter() {
-			let actor = actor_ref.borrow();
-			
-			let y_offset = self.top_panel.height;
-			let dest_y = (actor.get_position().y + y_offset) as int;
-			self.con.put_char_ex(actor.get_position().x as int, dest_y, actor.glyph, actor.color.to_tcod_color(), util::Color::black().to_tcod_color());
-	
+			self.draw_actor(actor_ref.borrow().deref());
 		}
+		
 		self.flush();
 	}
 
-	
+	fn draw_actor(&mut self, actor: &Actor) {
+		let y_offset = self.top_panel.height;
+		let dest_y = (actor.get_position().y + y_offset) as int;
+		self.con.put_char_ex(actor.get_position().x as int, dest_y, actor.glyph, actor.color.to_tcod_color(), util::Color::black().to_tcod_color());		
+	}
 	
 	pub fn flush(&self) {
 		Console::flush();
