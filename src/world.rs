@@ -10,6 +10,9 @@ use std::cell::{RefCell};
 use std::rc::{Rc};
 use std::collections::RingBuf;
 
+type ActorRef = Rc<RefCell<Actor>>;
+
+
 #[deriving(PartialEq)]
 enum CellType {
     Wall,
@@ -17,12 +20,13 @@ enum CellType {
 }
 
 struct Cell {
-	cell_type : CellType,
+	cell_type: CellType,
+	actor: Option<ActorRef>
 }
 
 impl Cell {
 	fn new(cell_type: CellType) -> Cell {
-		Cell {cell_type: cell_type}
+		Cell {cell_type: cell_type, actor: None}
 	}
 
 	pub fn get_glyph(&self) -> char {
@@ -40,7 +44,6 @@ impl Cell {
 	}
 }
 
-type ActorRef = Rc<RefCell<Actor>>;
 
 pub struct World {
 	pub width: uint,
