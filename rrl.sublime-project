@@ -8,6 +8,10 @@
 		{
 			"follow_symlinks": true,
 			"path": "/home/magnus/dev/rust/tcod-rs"
+		},
+		{
+			"follow_symlinks": true,
+			"path": "/home/magnus/dev/rust/rustyhex"
 		}
 	]
 }

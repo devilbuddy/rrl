@@ -1,11 +1,13 @@
 extern crate core;
 
 use util::Point;
-use util::Color;
 use actor::Actor;
+
 
 use std::rand;
 use std::num::SignedInt;
+use std::cell::{RefCell};
+use std::rc::{Rc};
 
 #[deriving(PartialEq)]
 enum CellType {
@@ -37,12 +39,17 @@ impl Cell {
 	}
 }
 
+
+pub type ActorRef = Rc<RefCell<Actor>>;
+
 pub struct World {
 	pub width: uint,
 	pub height: uint,
 	grid: Vec<Vec<Cell>>,
 	pub start: Point,
-	pub actors: Vec<Box<Actor>>,
+	//pub actors: Vec<Box<Actor + 'a>>,
+	pub actors: Vec<ActorRef>,
+	pub player: Box<ActorRef>
 }
 
 impl World {
@@ -58,17 +65,82 @@ impl World {
 			cols.push(rows);
 		}
 
-		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: Vec::new()}
+		let player = Actor::player();
+		let player_ref = Rc::new(RefCell::new(player));
+
+		let mut actors = Vec::new();
+		actors.push(player_ref.clone());
+		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: actors, player: box player_ref}
 	} 
 
-	pub fn add_actor(&mut self, actor: Box<Actor>) {
-		self.actors.push(actor);
+	// pub fn add_actor(&mut self, actor: Box<Actor + 'a>) {
+	// 	self.actors.push(actor);
+	// }
+
+	//pub fn get_player(&self) -> &Player {
+	//	return &*self.player;
+	//}
+
+	//pub fn get_player_mut(&mut self) -> &mut Player {
+	//	return &mut *self.player;
+	//}
+
+
+	pub fn tick(&mut self) {
+
+		println!("world tick");
+
+		let mut to_act : Vec<ActorRef> = Vec::new();
+
+		for actor_ref in self.actors.iter_mut() {
+			let actor = actor_ref.borrow();
+		 	let can_act = actor.brain.think();
+		 	if can_act {
+		 		to_act.push(actor_ref.clone());
+		 	}
+		}
+
+		for mut actor_ref in to_act.iter() {
+			let mut actor = actor_ref.borrow_mut();
+		 	let mut has_acted = false;
+		 	while !has_acted {
+		 		let action = actor.brain.act();
+		 		match action {
+		 			Some(move_action) => {
+
+        				let mut p = Point::new(actor.get_position().x, actor.get_position().y);
+						p.translate(move_action.direction);
+						let walkable = self.is_walkable(&p);
+	    				if walkable { 
+	    					actor.set_position(p); 
+	    					has_acted = true;
+	    				}
+		 			},
+		 			None => {}
+		 		}
+		 	}
+		}
+	}
+
+	pub fn is_valid(&self, p: &Point) -> bool {
+		return p.x < self.width && p.y < self.height;
+	}
+
+	pub fn is_walkable(&self, p: &Point) -> bool {
+		return self.is_valid(p) && self.get_cell(p.x, p.y).is_walkable();
+	}
+
+	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
+		&self.grid[y][x]
 	}
 
 	pub fn generate(&mut self) {
+		println!("generate");
+
 		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
 
 		self.actors.clear();
+		self.actors.push(*self.player.clone());
 
 		let fill_prob = 40;
 		let generations = 5u;
@@ -161,32 +233,22 @@ impl World {
 		
 		// random start positon
 		let index = rand::random::<uint>() % floors.len();
-		self.start.x = floors[index].x;
-		self.start.y = floors[index].y;
+		let mut p = self.player.borrow_mut();
+		p.set_position(Point {x: floors[index].x, y: floors[index].y});
 		floors.remove(index);
 
 		let enemies_count = 10u;
 		for _ in range(0, enemies_count) {
 			let index = rand::random::<uint>() % floors.len();
 			
-			let mut actor = box Actor::new('k', Color::green());
-			actor.set_position(Point{x: floors[index].x, y: floors[index].y});
-			self.add_actor(actor);
+			let mut monster = Actor::kobold();
+			monster.set_position(Point{x: floors[index].x, y: floors[index].y});
+			let monster_ref = Rc::new(RefCell::new(monster));
+			self.actors.push(monster_ref.clone());
 
 			floors.remove(index);			
 		}
 
 	}
 
-	pub fn is_valid(&self, p: &Point) -> bool {
-		return p.x < self.width && p.y < self.height;
-	}
-
-	pub fn is_walkable(&self, p: &Point) -> bool {
-		return self.is_valid(p) && self.get_cell(p.x, p.y).is_walkable();
-	}
-
-	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
-		&self.grid[y][x]
-	}
 }
