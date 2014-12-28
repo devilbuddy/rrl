@@ -9,7 +9,6 @@ use std::collections::RingBuf;
 
 type ActorRef = Rc<RefCell<Actor>>;
 
-
 #[deriving(PartialEq)]
 pub enum CellType {
     Wall,
@@ -93,24 +92,19 @@ impl World {
 		let actor_ref_option = self.to_act.pop_front();
 		match actor_ref_option {
 			Some(actor_ref) => {
-				let mut actor = actor_ref.borrow_mut();
-				let action = actor.brain.act();
+				let action = actor_ref.borrow().brain.act();
 		 		match action {
 		 			Some(move_action) => {
-
-		 				let current_position = Point::new(actor.get_position().x, actor.get_position().y);
-
-        				let mut new_position = Point::new(actor.get_position().x, actor.get_position().y);
+		 				let mut new_position = Point{x: 0, y: 0};
+		 				{
+		 					let actor = actor_ref.borrow();
+							new_position.x = actor.get_position().x;
+							new_position.y = actor.get_position().y;
+						}
 						new_position.translate(move_action.direction);
 						
-						let walkable = self.is_walkable(&new_position);
-	    				if walkable { 
-	    					
-							self.grid[current_position.y][current_position.x].actor = None;
-							
-							
-							self.grid[new_position.y][new_position.x].actor = Some(actor_ref.clone());
-							actor.set_position(new_position);
+	    				if self.is_walkable(&new_position) { 
+	    					self.set_actor_position(&actor_ref, &new_position);
 	    				}
 		 			},
 		 			None => {
@@ -122,6 +116,27 @@ impl World {
 			None => {}
 		}
 		
+	}
+
+	fn set_actor_position(&mut self, actor_ref: &ActorRef, position: &Point) {
+		let mut actor = actor_ref.borrow_mut();
+		{
+			let p = actor.get_position();
+			let current_position = Point::new(p.x, p.y);
+			
+			self.grid[current_position.y][current_position.x].actor = None;
+			self.grid[position.y][position.x].actor = Some(actor_ref.clone());
+		}
+		
+		// set new location
+		let new_position = Point::new(position.x, position.y);
+		actor.deref_mut().set_position(new_position);
+	}
+
+	pub fn add_actor(&mut self, actor: Actor, position: Point) {
+		let actor_ref = Rc::new(RefCell::new(actor));
+		self.set_actor_position(&actor_ref, &position);
+		self.actors.push(actor_ref.clone());
 	}
 
 	pub fn is_valid(&self, p: &Point) -> bool {

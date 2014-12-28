@@ -8,9 +8,8 @@ mod generator;
 mod renderer;
 mod input;
 
-
 fn main() {
-
+	
 	println!("main");
 
 	let w = 80;
@@ -23,7 +22,6 @@ fn main() {
   	renderer.draw_world(&world);
 
     while !Console::window_closed() {
-
     	world.tick();
     	renderer.draw_world(&world);
     }

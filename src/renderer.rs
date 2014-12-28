@@ -1,5 +1,5 @@
 extern crate tcod;
-use tcod::{Console, BackgroundFlag};
+use tcod::{Console, BackgroundFlag, TextAlignment};
 
 use actor::Actor;
 use world::World;
@@ -32,7 +32,7 @@ impl Renderer {
 
 	pub fn new(width: uint, height: uint, title: &str) -> Renderer {
 		let top_panel_height = 3;
-		let top_panel = Panel::new(0, 0, width, top_panel_height, util::Color::blue(), util::Color::black());
+		let top_panel = Panel::new(0, 0, width, top_panel_height, util::Color::panel_green(), util::Color::black());
 
 		let window_height = height + top_panel_height;
 		Renderer {con: Console::init_root(width as int, window_height as int, title, false),
@@ -40,12 +40,7 @@ impl Renderer {
 	}
 
 	pub fn draw_world(&mut self, world: &World) {
-		Console::blit(&self.top_panel.con, // source console
-						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
-						&mut self.con, // dest console 
-						0, 0, 
-						1f32, 
-						1f32);
+		self.draw_top_panel(world);
 
 		let y_offset = self.top_panel.height;
 
@@ -61,8 +56,27 @@ impl Renderer {
 		for actor_ref in world.actors.iter() {
 			self.draw_actor(actor_ref.borrow().deref());
 		}
-		
+
 		self.flush();
+	}
+
+	fn draw_top_panel(&mut self, world: &World) {
+		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left,
+                         "Health:");
+
+		self.top_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left,
+                         "Ammo:");
+
+		self.top_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left,
+                         "Kills:");
+
+
+		Console::blit(&self.top_panel.con, // source console
+						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
+						&mut self.con, // dest console 
+						0, 0, 
+						1f32, 
+						1f32);
 	}
 
 	fn draw_actor(&mut self, actor: &Actor) {

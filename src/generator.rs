@@ -5,8 +5,6 @@ use world::{World, CellType};
 
 use std::rand;
 use std::num::SignedInt;
-use std::cell::{RefCell};
-use std::rc::{Rc};
 
 pub fn generate(world: &mut World) {
 		println!("generate");
@@ -100,41 +98,34 @@ pub fn generate(world: &mut World) {
 				let cell = world.grid.index_mut(&y).index_mut(&x);
 				match grid[y][x] {
 					1 => { cell.cell_type = CellType::Wall },
-					_ => { cell.cell_type = CellType::Floor; floors.push(Point::new(x,y)) },
+					_ => { 
+							cell.cell_type = CellType::Floor; 
+							floors.push(Point::new(x,y)) },
 				}	
 			}
 		}
 		
 		// random start positon
 		let index = rand::random::<uint>() % floors.len();
-		let mut p = world.player.borrow_mut();
-		p.set_position(Point {x: floors[index].x, y: floors[index].y});
-		floors.remove(index);
+		{
+			let mut p = world.player.borrow_mut();
+			p.set_position(Point {x: floors[index].x, y: floors[index].y});
+			floors.remove(index);
+		}
 
 		let enemies_count = 10u;
 		for _ in range(0, enemies_count) {
 			let index = rand::random::<uint>() % floors.len();
-			
-			let mut monster = Actor::kobold();
-			monster.set_position(Point{x: floors[index].x, y: floors[index].y});
-			let monster_ref = Rc::new(RefCell::new(monster));
-			world.actors.push(monster_ref.clone());
-
+			world.add_actor(Actor::kobold(), Point{x: floors[index].x, y: floors[index].y});
 			floors.remove(index);			
 		}
 
 		let generators_count = 10u;
 		for _ in range(0, generators_count) {
 			let index = rand::random::<uint>() % floors.len();
-			
-			let mut monster = Actor::kobold_generator();
-			monster.set_position(Point{x: floors[index].x, y: floors[index].y});
-			let monster_ref = Rc::new(RefCell::new(monster));
-			world.actors.push(monster_ref.clone());
-
+			world.add_actor(Actor::kobold_generator(), Point{x: floors[index].x, y: floors[index].y});
 			floors.remove(index);			
 		}
-
 
 
 	}
