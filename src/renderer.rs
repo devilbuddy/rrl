@@ -61,15 +61,17 @@ impl Renderer {
 	}
 
 	fn draw_top_panel(&mut self, world: &World) {
-		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left,
-                         "Health:");
 
-		self.top_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left,
-                         "Ammo:");
+		let player = world.player.borrow();
+		let player_state = &world.player_state;
 
-		self.top_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left,
-                         "Kills:");
+		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left, "Health:");
+		self.top_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left, "Ammo:");
+		self.top_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left, "Kills:");
 
+		self.top_panel.con.print_ex(9, 1, BackgroundFlag::None, TextAlignment::Left, player.health.to_string().as_slice());
+		self.top_panel.con.print_ex(22, 1, BackgroundFlag::None, TextAlignment::Left, player_state.ammo.to_string().as_slice());
+		self.top_panel.con.print_ex(37, 1, BackgroundFlag::None, TextAlignment::Left, player_state.kills.to_string().as_slice());
 
 		Console::blit(&self.top_panel.con, // source console
 						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 

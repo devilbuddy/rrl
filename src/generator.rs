@@ -127,5 +127,13 @@ pub fn generate(world: &mut World) {
 			floors.remove(index);			
 		}
 
+		let ammo_crates_count = 10u;
+		for _ in range(0, ammo_crates_count) {
+			let index = rand::random::<uint>() % floors.len();
+			world.add_actor(Actor::ammo_crate(), Point{x: floors[index].x, y: floors[index].y});
+			floors.remove(index);			
+		}
+
+
 
 	}

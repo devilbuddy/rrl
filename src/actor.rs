@@ -84,14 +84,14 @@ impl Brain for MonsterBrain {
 	}
 }
 
-struct GeneratorBrain;
-impl GeneratorBrain {
-	pub fn new() -> GeneratorBrain {
-		GeneratorBrain
+struct NoBrain;
+impl NoBrain {
+	pub fn new() -> NoBrain {
+		NoBrain
 	}
 }
 
-impl Brain for GeneratorBrain {
+impl Brain for NoBrain {
 	fn think(&self) -> bool {
 		return false;
 	}
@@ -106,21 +106,27 @@ pub struct Actor {
     pub glyph : char,
     pub color : Color,
     pub is_player : bool,
+    pub is_solid : bool,
+    pub health: uint,
     pub brain : Box<Brain + 'static>
 }
 
 
 impl Actor {
 	pub fn player() -> Actor {
-		Actor {position: Point::new(0,0), glyph: '@', color: Color::red(), is_player: true, brain: box PlayerBrain::new()}
+		Actor {position: Point::new(0,0), glyph: '@', color: Color::red(), is_player: true, is_solid : true, health: 0, brain: box PlayerBrain::new()}
 	}
 
 	pub fn kobold() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), is_player: false, brain: box MonsterBrain::new()}
+		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), is_player: false, is_solid : true, health: 0, brain: box MonsterBrain::new()}
 	}
 
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'Å', color: Color::purple(), is_player: false, brain: box GeneratorBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: 'Å', color: Color::purple(), is_player: false, is_solid : true, health: 0, brain: box NoBrain::new()}	
+	}
+
+	pub fn ammo_crate() -> Actor {
+		Actor {position: Point::new(0,0), glyph: '*', color: Color::brown(), is_player: false, is_solid : false, health: 0, brain: box NoBrain::new()}	
 	}
 
 	pub fn get_position(&self) -> &Point {

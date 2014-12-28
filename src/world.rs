@@ -36,7 +36,9 @@ impl Cell {
 		match self.cell_type {
 			CellType::Floor => { 
 				match self.actor {
-					Some(_) => { return false; }
+					Some(ref actor) => { 
+						return !actor.borrow().is_solid; 
+					}
 					None => { return true; }
 				}
 			},
@@ -45,14 +47,17 @@ impl Cell {
 	}
 }
 
-
+pub struct PlayerState {
+	pub ammo : uint,
+	pub kills : uint
+}
 pub struct World {
 	pub width: uint,
 	pub height: uint,
 	pub grid: Vec<Vec<Cell>>,
-	pub start: Point,
 	pub actors: Vec<ActorRef>,
 	pub player: Box<ActorRef>,
+	pub player_state : Box<PlayerState>,
 	to_act: RingBuf<ActorRef>
 }
 
@@ -70,11 +75,20 @@ impl World {
 		}
 
 		let player = Actor::player();
+		let player_state = PlayerState {ammo: 0, kills: 0};
 		let player_ref = Rc::new(RefCell::new(player));
-
 		let mut actors = Vec::new();
 		actors.push(player_ref.clone());
-		World {width: width, height: height, grid: cols, start: Point::new(0,0), actors: actors, player: box player_ref, to_act: RingBuf::new()}
+
+		World {	
+				width: width, 
+				height: height, 
+				grid: cols, 
+				actors: actors, 
+				player: box player_ref, 
+				player_state: box player_state, 
+				to_act: RingBuf::new() 
+			}
 	} 
 
 	pub fn tick(&mut self) {
