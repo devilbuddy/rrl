@@ -1,24 +1,69 @@
-use util::Point;
-use util::Color;
-use util::Direction;
+use util::{Point, Color, Direction};
+use world::{World, ActorRef};
 
 use input;
 
 use std::rand;
 
-pub struct MoveAction {
-	pub direction: Direction
+pub struct Action {
+	move_action: Option<MoveAction>,
+	bump_action: Option<BumpAction>
 }
 
-impl MoveAction {
-	pub fn new(direction: Direction) -> MoveAction {
-		MoveAction{direction: direction}
+struct MoveAction {
+	direction: Direction
+}
+
+struct BumpAction {
+	position: Point
+}
+
+impl Action {
+	pub fn make_move_action(direction: Direction) -> Action {
+		Action{
+			move_action: Some(MoveAction {direction: direction}),
+			bump_action: None
+		}
+	}
+
+	pub fn make_bump_action(positon: &Point) -> Action {
+		Action {
+			move_action: None,
+			bump_action: Some(BumpAction {position: Point::new(positon.x, positon.y)})
+		}
+	}
+
+	pub fn execute(&self, actor_ref: &ActorRef, world: &mut World) {
+
+		match self.move_action {
+			Some(ref move_action) => {
+				let mut new_position = Point{x: 0, y: 0};
+				{
+					let actor = actor_ref.borrow();
+					new_position.x = actor.get_position().x;
+					new_position.y = actor.get_position().y;
+				}
+				new_position.translate(&move_action.direction);
+				
+				if world.is_walkable(&new_position) { 
+					world.set_actor_position(actor_ref, &new_position);
+				}
+			}
+			None => {}
+		}
+
+		match self.bump_action {
+			Some(ref bump_action) => {
+				println!("bump");
+			},
+			None => {}
+		}
 	}
 }
 
 pub trait Brain {
 	fn think(&self) -> bool;
-	fn act(&self) -> Option<MoveAction>;
+	fn act(&self, world: &World) -> Option<Action>;
 }
 
 struct PlayerBrain;
@@ -36,7 +81,7 @@ impl Brain for PlayerBrain {
 		return true;
 	}
 
-	fn act(&self) -> Option<MoveAction> {
+	fn act(&self, world: &World) -> Option<Action> {
 		let mut direction = Direction::None;
 		match input::check_for_keypress() {
 			Some(key_code) => {
@@ -53,7 +98,23 @@ impl Brain for PlayerBrain {
 			}
         }
 
-		Some(MoveAction::new(direction))
+        let player = world.get_player().borrow();
+        let mut position = Point::new(player.get_position().x, player.get_position().y);
+        position.translate(&direction);
+        if world.is_walkable(&position) {
+        	Some(Action::make_move_action(direction))	
+        } else {
+
+        	let cell = world.get_cell(position.x, position.y);
+        	match cell.actor {
+        		Some(_) => { 
+        			return Some(Action::make_bump_action(&position))
+        		}
+        		None => {}
+        	}
+        	None
+        }
+		
 	}
 }
 
@@ -71,7 +132,7 @@ impl Brain for MonsterBrain {
 		return true;
 	}
 
-	fn act(&self) -> Option<MoveAction> {
+	fn act(&self, world: &World) -> Option<Action> {
 		let mut direction = Direction::None;
 		match rand::random::<uint>()%4 {
 			0 => { direction = Direction::North },
@@ -80,7 +141,7 @@ impl Brain for MonsterBrain {
 			3 => { direction = Direction::West }, 
 			_ => { }
 		}
-		Some(MoveAction{direction: direction})
+		Some(Action::make_move_action(direction))
 	}
 }
 
@@ -96,7 +157,7 @@ impl Brain for NoBrain {
 		return false;
 	}
 
-	fn act(&self) -> Option<MoveAction> {
+	fn act(&self, world: &World) -> Option<Action> {
 		None
 	}
 }
@@ -114,15 +175,24 @@ pub struct Actor {
 
 impl Actor {
 	pub fn player() -> Actor {
-		Actor {position: Point::new(0,0), glyph: '@', color: Color::red(), is_player: true, is_solid : true, health: 0, brain: box PlayerBrain::new()}
+		Actor {
+			position: Point::new(0,0), 
+			glyph: '@', 
+			color: Color::red(), 
+			is_player: true, 
+			is_solid : true, 
+			health: 0, 
+			brain: box PlayerBrain::new()
+		}
 	}
 
 	pub fn kobold() -> Actor {
 		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), is_player: false, is_solid : true, health: 0, brain: box MonsterBrain::new()}
 	}
 
+	// ´æøłĸ ŋđðßª
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'Å', color: Color::purple(), is_player: false, is_solid : true, health: 0, brain: box NoBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), is_player: false, is_solid : true, health: 0, brain: box NoBrain::new()}	
 	}
 
 	pub fn ammo_crate() -> Actor {

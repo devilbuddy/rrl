@@ -7,7 +7,7 @@ use std::cell::{RefCell};
 use std::rc::{Rc};
 use std::collections::RingBuf;
 
-type ActorRef = Rc<RefCell<Actor>>;
+pub type ActorRef = Rc<RefCell<Actor>>;
 
 #[deriving(PartialEq)]
 pub enum CellType {
@@ -17,7 +17,7 @@ pub enum CellType {
 
 struct Cell {
 	pub cell_type: CellType,
-	actor: Option<ActorRef>
+	pub actor: Option<ActorRef>
 }
 
 impl Cell {
@@ -106,23 +106,13 @@ impl World {
 		let actor_ref_option = self.to_act.pop_front();
 		match actor_ref_option {
 			Some(actor_ref) => {
-				let action = actor_ref.borrow().brain.act();
-		 		match action {
-		 			Some(move_action) => {
-		 				let mut new_position = Point{x: 0, y: 0};
-		 				{
-		 					let actor = actor_ref.borrow();
-							new_position.x = actor.get_position().x;
-							new_position.y = actor.get_position().y;
-						}
-						new_position.translate(move_action.direction);
-						
-	    				if self.is_walkable(&new_position) { 
-	    					self.set_actor_position(&actor_ref, &new_position);
-	    				}
+				let action_option = actor_ref.borrow().brain.act(self);
+		 		match action_option {
+		 			Some(action) => {
+		 				action.execute(&actor_ref, self);
 		 			},
 		 			None => {
-		 				// no action taken (player)
+		 				// no action taken (player). check again next tick
 		 				self.to_act.push_front(actor_ref.clone());
 		 			}
 		 		}
@@ -132,7 +122,7 @@ impl World {
 		
 	}
 
-	fn set_actor_position(&mut self, actor_ref: &ActorRef, position: &Point) {
+	pub fn set_actor_position(&mut self, actor_ref: &ActorRef, position: &Point) {
 		let mut actor = actor_ref.borrow_mut();
 		{
 			let p = actor.get_position();
@@ -163,6 +153,10 @@ impl World {
 
 	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
 		&self.grid[y][x]
+	}
+
+	pub fn get_player(&self) -> &ActorRef {
+		return &*self.player;
 	}
 
 }

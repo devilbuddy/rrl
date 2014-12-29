@@ -25,22 +25,25 @@ impl Panel {
 
 pub struct Renderer {
     con: Console,
-    top_panel: Panel
+    top_panel: Panel,
+    bottom_panel: Panel
 }
 
 impl Renderer {
 
 	pub fn new(width: uint, height: uint, title: &str) -> Renderer {
-		let top_panel_height = 3;
-		let top_panel = Panel::new(0, 0, width, top_panel_height, util::Color::panel_green(), util::Color::black());
+		let panel_height = 3;
+		let top_panel = Panel::new(0, 0, width, panel_height, util::Color::panel_green(), util::Color::black());
+		let bottom_panel = Panel::new(0, 0, width, panel_height + height, util::Color::panel_green(), util::Color::black());
 
-		let window_height = height + top_panel_height;
+		let window_height = height + panel_height + panel_height;
 		Renderer {con: Console::init_root(width as int, window_height as int, title, false),
-				  top_panel: top_panel }
+				  top_panel: top_panel, bottom_panel: bottom_panel}
 	}
 
 	pub fn draw_world(&mut self, world: &World) {
 		self.draw_top_panel(world);
+		self.draw_bottom_panel(world);
 
 		let y_offset = self.top_panel.height;
 
@@ -65,18 +68,35 @@ impl Renderer {
 		let player = world.player.borrow();
 		let player_state = &world.player_state;
 
-		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left, "Health:");
-		self.top_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left, "Ammo:");
-		self.top_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left, "Kills:");
-
-		self.top_panel.con.print_ex(9, 1, BackgroundFlag::None, TextAlignment::Left, player.health.to_string().as_slice());
-		self.top_panel.con.print_ex(22, 1, BackgroundFlag::None, TextAlignment::Left, player_state.ammo.to_string().as_slice());
-		self.top_panel.con.print_ex(37, 1, BackgroundFlag::None, TextAlignment::Left, player_state.kills.to_string().as_slice());
-
+		self.top_panel.con.print_ex(1, 0, BackgroundFlag::None, TextAlignment::Left, "Log message 1");
+		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left, "Log message 2");
+		self.top_panel.con.print_ex(1, 2, BackgroundFlag::None, TextAlignment::Left, "Log message 3");
+	
 		Console::blit(&self.top_panel.con, // source console
 						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
 						&mut self.con, // dest console 
 						0, 0, 
+						1f32, 
+						1f32);
+	}
+
+	fn draw_bottom_panel(&mut self, world: &World) {
+
+		let player = world.player.borrow();
+		let player_state = &world.player_state;
+
+		self.bottom_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left, "Health:");
+		self.bottom_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left, "Ammo:");
+		self.bottom_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left, "Kills:");
+
+		self.bottom_panel.con.print_ex(9, 1, BackgroundFlag::None, TextAlignment::Left, player.health.to_string().as_slice());
+		self.bottom_panel.con.print_ex(22, 1, BackgroundFlag::None, TextAlignment::Left, player_state.ammo.to_string().as_slice());
+		self.bottom_panel.con.print_ex(37, 1, BackgroundFlag::None, TextAlignment::Left, player_state.kills.to_string().as_slice());
+
+		Console::blit(&self.bottom_panel.con, // source console
+						self.bottom_panel.x as int, self.bottom_panel.y as int , self.bottom_panel.width as int, self.bottom_panel.height as int, // source 
+						&mut self.con, // dest console 
+						0, 50 + self.top_panel.height as int, 
 						1f32, 
 						1f32);
 	}
