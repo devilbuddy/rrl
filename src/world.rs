@@ -58,7 +58,8 @@ pub struct World {
 	pub actors: Vec<ActorRef>,
 	pub player: Box<ActorRef>,
 	pub player_state : Box<PlayerState>,
-	to_act: RingBuf<ActorRef>
+	to_act: RingBuf<ActorRef>,
+	pub messages : RingBuf<String>
 }
 
 impl World {
@@ -87,7 +88,8 @@ impl World {
 				actors: actors, 
 				player: box player_ref, 
 				player_state: box player_state, 
-				to_act: RingBuf::new() 
+				to_act: RingBuf::new(), 
+				messages: RingBuf::new()
 			}
 	} 
 
@@ -106,7 +108,10 @@ impl World {
 		let actor_ref_option = self.to_act.pop_front();
 		match actor_ref_option {
 			Some(actor_ref) => {
-				let action_option = actor_ref.borrow().brain.act(self);
+				let mut action_option = None;
+				{
+					action_option = actor_ref.borrow().brain.act(&actor_ref, self);
+				}
 		 		match action_option {
 		 			Some(action) => {
 		 				action.execute(&actor_ref, self);
@@ -157,6 +162,13 @@ impl World {
 
 	pub fn get_player(&self) -> &ActorRef {
 		return &*self.player;
+	}
+
+	pub fn add_message(&mut self, message: &str) {
+		self.messages.push_back(String::from_str(message));
+		if self.messages.len() > 3 {
+			self.messages.pop_front();
+		}
 	}
 
 }

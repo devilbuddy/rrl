@@ -64,14 +64,12 @@ impl Renderer {
 	}
 
 	fn draw_top_panel(&mut self, world: &World) {
-
-		let player = world.player.borrow();
-		let player_state = &world.player_state;
-
-		self.top_panel.con.print_ex(1, 0, BackgroundFlag::None, TextAlignment::Left, "Log message 1");
-		self.top_panel.con.print_ex(1, 1, BackgroundFlag::None, TextAlignment::Left, "Log message 2");
-		self.top_panel.con.print_ex(1, 2, BackgroundFlag::None, TextAlignment::Left, "Log message 3");
-	
+		let mut y = 0;
+		for message in world.messages.iter() {
+			self.top_panel.con.print_ex(1, y, BackgroundFlag::None, TextAlignment::Left, message.as_slice());
+			y += 1;
+		}
+		
 		Console::blit(&self.top_panel.con, // source console
 						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
 						&mut self.con, // dest console 
