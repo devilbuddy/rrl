@@ -87,6 +87,12 @@ impl Renderer {
 		self.bottom_panel.con.print_ex(16, 1, BackgroundFlag::None, TextAlignment::Left, "Ammo:");
 		self.bottom_panel.con.print_ex(30, 1, BackgroundFlag::None, TextAlignment::Left, "Kills:");
 
+		if player_state.is_aiming {
+			self.bottom_panel.con.print_ex(40, 1, BackgroundFlag::None, TextAlignment::Left, "[Amiming]");
+		} else {
+			self.bottom_panel.con.print_ex(40, 1, BackgroundFlag::None, TextAlignment::Left, "[Walking]");
+		}
+
 		self.bottom_panel.con.print_ex(9, 1, BackgroundFlag::None, TextAlignment::Left, player.health.to_string().as_slice());
 		self.bottom_panel.con.print_ex(22, 1, BackgroundFlag::None, TextAlignment::Left, player_state.ammo.to_string().as_slice());
 		self.bottom_panel.con.print_ex(37, 1, BackgroundFlag::None, TextAlignment::Left, player_state.kills.to_string().as_slice());

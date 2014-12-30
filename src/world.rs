@@ -49,8 +49,16 @@ impl Cell {
 
 pub struct PlayerState {
 	pub ammo : uint,
-	pub kills : uint
+	pub kills : uint,
+	pub is_aiming: bool,
 }
+
+impl PlayerState {
+	pub fn set_is_aiming(&mut self, is_aiming: bool) {
+		self.is_aiming = is_aiming;
+	}
+}
+
 pub struct World {
 	pub width: uint,
 	pub height: uint,
@@ -76,7 +84,7 @@ impl World {
 		}
 
 		let player = Actor::player();
-		let player_state = PlayerState {ammo: 0, kills: 0};
+		let player_state = PlayerState {ammo: 0, kills: 0, is_aiming: false};
 		let player_ref = Rc::new(RefCell::new(player));
 		let mut actors = Vec::new();
 		actors.push(player_ref.clone());
@@ -149,7 +157,7 @@ impl World {
 		self.actors.push(actor_ref.clone());
 	}
 
-	pub fn remove_actor(&mut self, position: Point) {
+	pub fn remove_actor(&mut self, position: &Point) {
 		self.grid[position.y][position.x].actor = None;
 	}
 

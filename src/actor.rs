@@ -46,17 +46,23 @@ impl Action {
 		
 		// bump
 		if let Some(ref bump_action) = self.bump_action {
-			let cell = world.get_cell(bump_action.position.x, bump_action.position.y);	
-			match cell.actor {
-				Some(ref bump_target_actor_ref) => {
-					message = Some(format!("{} bumped by {}", bump_target_actor_ref.borrow().name.as_slice(), actor_ref.borrow().name.as_slice()));
-					let mut target = bump_target_actor_ref.borrow_mut();
-					target.bumped_by(actor_ref);
-					if !target.is_alive() {
-						//cell.actor = None;
-					}
-				},
-				None => { assert!(false) }
+			let mut target_died = false;
+
+			{
+				let cell = world.get_cell(bump_action.position.x, bump_action.position.y);	
+				match cell.actor {
+					Some(ref bump_target_actor_ref) => {
+						message = Some(format!("{} bumped by {}", bump_target_actor_ref.borrow().name.as_slice(), actor_ref.borrow().name.as_slice()));
+						let mut target = bump_target_actor_ref.borrow_mut();
+						target.bumped_by(actor_ref);
+						target_died = !target.is_alive();
+					},
+					None => { assert!(false) }
+				}
+			}
+
+			if target_died {
+				world.remove_actor(&bump_action.position);
 			}
 		}
 		
@@ -69,7 +75,7 @@ impl Action {
 
 pub trait Brain {
 	fn think(&self) -> bool;
-	fn act(&self, actor_ref: &ActorRef, world: &World) -> Option<Action>;
+	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action>;
 }
 
 struct PlayerBrain;
@@ -87,7 +93,7 @@ impl Brain for PlayerBrain {
 		return true;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &World) -> Option<Action> {
+	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
 		let mut direction = Direction::None;
 		match input::check_for_keypress() {
 			Some(key_code) => {
@@ -96,7 +102,16 @@ impl Brain for PlayerBrain {
         			input::KeyCode::Down => { direction = Direction::South },
         			input::KeyCode::Left => { direction = Direction::West },
         			input::KeyCode::Right => { direction = Direction::East },
-        			_ => {}
+        			input::KeyCode::ShiftUp => { println!("fire up");   },
+        			input::KeyCode::ShiftDown => { println!("fire down"); },
+        			input::KeyCode::ShiftLeft => { println!("fire left"); },
+        			input::KeyCode::ShiftRight => { println!("fire right"); },
+        			input::KeyCode::Shift => { 
+        				println!("shift"); 
+        				world.player_state.set_is_aiming(true);
+						return None; 
+        			},
+        			_ => { return None; }
 				}
 			},
 			None => {
@@ -111,8 +126,11 @@ impl Brain for PlayerBrain {
         position.translate(&direction);
 
         if world.is_walkable(&position) {
+        	world.player_state.set_is_aiming(false);
         	Some(Action::make_move_action(&position))	
         } else {
+
+        	world.player_state.set_is_aiming(false);
         	let cell = world.get_cell(position.x, position.y);
         	if let Some(_) = cell.actor {
         		return Some(Action::make_bump_action(&position))
@@ -137,7 +155,7 @@ impl Brain for MonsterBrain {
 		return true;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &World) -> Option<Action> {
+	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
 		let mut direction = Direction::None;
 		match rand::random::<uint>()%4 {
 			0 => { direction = Direction::North },
@@ -177,7 +195,7 @@ impl Brain for NoBrain {
 		return false;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &World) -> Option<Action> {
+	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
 		None
 	}
 }
