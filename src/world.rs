@@ -105,25 +105,26 @@ impl World {
 			}
 		}
 
-		let actor_ref_option = self.to_act.pop_front();
-		match actor_ref_option {
-			Some(actor_ref) => {
-				let mut action_option = None;
-				{
-					action_option = actor_ref.borrow().brain.act(&actor_ref, self);
-				}
-		 		match action_option {
-		 			Some(action) => {
-		 				action.execute(&actor_ref, self);
-		 			},
-		 			None => {
-		 				// no action taken (player). check again next tick
-		 				self.to_act.push_front(actor_ref.clone());
-		 			}
-		 		}
-			},
-			None => {}
+		if let Some(actor_ref) = self.to_act.pop_front() {
+			let mut action_option;
+			{
+				action_option = actor_ref.borrow().brain.act(&actor_ref, self);
+			}
+	 		match action_option {
+	 			Some(action) => {
+	 				action.execute(&actor_ref, self);
+	 			},
+	 			None => {
+	 				// no action taken (player). check again next tick
+	 				self.to_act.push_front(actor_ref.clone());
+	 			}
+	 		}
 		}
+		
+		// clean up dead actors
+		self.actors.retain(|ref actor_ref| {
+			actor_ref.borrow().is_alive()
+		});
 		
 	}
 
@@ -148,6 +149,10 @@ impl World {
 		self.actors.push(actor_ref.clone());
 	}
 
+	pub fn remove_actor(&mut self, position: Point) {
+		self.grid[position.y][position.x].actor = None;
+	}
+
 	pub fn is_valid(&self, p: &Point) -> bool {
 		return p.x < self.width && p.y < self.height;
 	}
@@ -160,9 +165,6 @@ impl World {
 		&self.grid[y][x]
 	}
 
-	pub fn get_player(&self) -> &ActorRef {
-		return &*self.player;
-	}
 
 	pub fn add_message(&mut self, message: &str) {
 		self.messages.push_back(String::from_str(message));

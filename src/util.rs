@@ -18,6 +18,11 @@ impl Point {
 		Point {x: x, y: y}
 	}
 
+	pub fn set(&mut self, other: &Point) {
+		self.x = other.x;
+		self.y = other.y;
+	}
+
 	pub fn translate(&mut self, direction: &Direction) {
 		match *direction {
 			Direction::North => { self.y -= 1 },

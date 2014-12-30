@@ -19,17 +19,17 @@ struct BumpAction {
 }
 
 impl Action {
-	pub fn make_move_action(positon: &Point) -> Action {
+	pub fn make_move_action(position: &Point) -> Action {
 		Action{
-			move_action: Some(MoveAction {position: Point::new(positon.x, positon.y)}),
+			move_action: Some(MoveAction {position: Point::new(position.x, position.y)}),
 			bump_action: None
 		}
 	}
 
-	pub fn make_bump_action(positon: &Point) -> Action {
+	pub fn make_bump_action(position: &Point) -> Action {
 		Action {
 			move_action: None,
-			bump_action: Some(BumpAction {position: Point::new(positon.x, positon.y)})
+			bump_action: Some(BumpAction {position: Point::new(position.x, position.y)})
 		}
 	}
 
@@ -37,38 +37,32 @@ impl Action {
 
 		let mut message: Option<String> = None;
 
-		match self.move_action {
-			Some(ref move_action) => {
-				if world.is_walkable(&move_action.position) {
-					world.set_actor_position(actor_ref, &move_action.position);	
-				}
+		// move
+		if let Some(ref move_action) = self.move_action {
+			if world.is_walkable(&move_action.position) {
+				world.set_actor_position(actor_ref, &move_action.position);	
 			}
-			None => {}
 		}
-
-		match self.bump_action {
-			
-			Some(ref bump_action) => {
-				let cell = world.get_cell(bump_action.position.x, bump_action.position.y);
-				
-				match cell.actor {
-					Some(ref bump_target_actor_ref) => {
-						message = Some(format!("{} bumped by {}", bump_target_actor_ref.borrow().name.as_slice(), actor_ref.borrow().name.as_slice()));
-						bump_target_actor_ref.borrow_mut().bumped_by(actor_ref);
-					},
-					None => { assert!(false) }
-				}
-				
-			},
-			None => {}
+		
+		// bump
+		if let Some(ref bump_action) = self.bump_action {
+			let cell = world.get_cell(bump_action.position.x, bump_action.position.y);	
+			match cell.actor {
+				Some(ref bump_target_actor_ref) => {
+					message = Some(format!("{} bumped by {}", bump_target_actor_ref.borrow().name.as_slice(), actor_ref.borrow().name.as_slice()));
+					let mut target = bump_target_actor_ref.borrow_mut();
+					target.bumped_by(actor_ref);
+					if !target.is_alive() {
+						//cell.actor = None;
+					}
+				},
+				None => { assert!(false) }
+			}
 		}
-
+		
 		// add action message
-		match message {
-			Some(message) => {
-				world.add_message(message.as_slice());
-			},
-			None => {}
+		if let Some(message) = message {
+    		world.add_message(message.as_slice());
 		}
 	}
 }
@@ -112,9 +106,7 @@ impl Brain for PlayerBrain {
 
         let mut position = Point::new(0,0);
         {
-        	let player = actor_ref.borrow();
-        	position.x = player.get_position().x;
-        	position.y = player.get_position().y;
+        	position.set(actor_ref.borrow().get_position());
         }
         position.translate(&direction);
 
@@ -122,11 +114,8 @@ impl Brain for PlayerBrain {
         	Some(Action::make_move_action(&position))	
         } else {
         	let cell = world.get_cell(position.x, position.y);
-        	match cell.actor {
-        		Some(_) => {
-        			return Some(Action::make_bump_action(&position))
-        		}
-        		None => {}
+        	if let Some(_) = cell.actor {
+        		return Some(Action::make_bump_action(&position))
         	}
         	None
         }
@@ -160,18 +149,19 @@ impl Brain for MonsterBrain {
 
 		let mut position = Point::new(0,0);
 		{
-			let actor = actor_ref.borrow();
-        	position.x = actor.get_position().x;
-        	position.y = actor.get_position().y;
+        	position.set(actor_ref.borrow().get_position());
         }
         position.translate(&direction);
 
         if world.is_walkable(&position) {
-        	Some(Action::make_move_action(&position))
+        	Some(Action::make_move_action(&position))	
         } else {
-        	Some(Action::make_move_action(actor_ref.borrow().get_position()))
+        	let cell = world.get_cell(position.x, position.y);
+        	if let Some(_) = cell.actor {
+        		return Some(Action::make_bump_action(&position))
+        	}
+        	None
         }
-		
 	}
 }
 
@@ -213,22 +203,21 @@ impl Actor {
 			name: "player".to_string(),
 			is_player: true, 
 			is_solid : true, 
-			health: 0, 
+			health: 100, 
 			brain: box PlayerBrain::new()
 		}
 	}
 
 	pub fn kobold() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), name: "kobold".to_string(), is_player: false, is_solid : true, health: 0, brain: box MonsterBrain::new()}
+		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), name: "kobold".to_string(), is_player: false, is_solid : true, health: 1, brain: box MonsterBrain::new()}
 	}
 
-	// ´æøłĸ ŋđðßª
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), name: "generator".to_string(),  is_player: false, is_solid : true, health: 0, brain: box NoBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), name: "generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box NoBrain::new()}	
 	}
 
 	pub fn ammo_crate() -> Actor {
-		Actor {position: Point::new(0,0), glyph: '*', color: Color::brown(), name: "ammo crate".to_string(), is_player: false, is_solid : false, health: 0, brain: box NoBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: '*', color: Color::brown(), name: "ammo crate".to_string(), is_player: false, is_solid : false, health: 1, brain: box NoBrain::new()}	
 	}
 
 	pub fn get_position(&self) -> &Point {
@@ -242,5 +231,9 @@ impl Actor {
 
 	pub fn bumped_by(&mut self, actor_ref: &ActorRef) {
 		self.health -= 1;
+	}
+
+	pub fn is_alive(&self) -> bool {
+		return self.health > 0;
 	}
 }
