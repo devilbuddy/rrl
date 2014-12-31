@@ -84,13 +84,14 @@ impl Action {
 			}
 
 			if target_died {
-
 				world.remove_actor(&bump_action.position);
 			}
 		}
 		
+
+		// fire 
 		if let Some(ref fire_action) = self.fire_action {
-			println!("fire");
+			let mut target_died = false;
 			let mut p = Point::new(0,0);
 			{
 				let actor = actor_ref.borrow();
@@ -107,6 +108,13 @@ impl Action {
 						let mut target = hit_actor_ref.borrow_mut();
 						let mut msg_string = format!("{} fired at {}", actor_ref.borrow().name.as_slice(), target.name.as_slice()); 
 						
+						target.bumped_by(actor_ref);
+						target_died = !target.is_alive();
+
+						if target_died {
+							let die_message = format!(" - {} dies",  target.name.as_slice());
+							msg_string.push_str(die_message.as_slice());
+						}
 
 						message = Some(msg_string);
 						done = true;
@@ -121,6 +129,11 @@ impl Action {
 					p.translate(&fire_action.direction);
 				}
 			}
+
+			if target_died {
+				world.remove_actor(&p);
+			}
+
 			
 		}
 

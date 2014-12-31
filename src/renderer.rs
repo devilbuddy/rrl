@@ -21,6 +21,10 @@ impl Panel {
 		con.clear();
 		Panel {x: x, y: y, width: width, height: height, con: con}
 	}
+
+	pub fn clear(&mut self) {
+		self.con.clear();
+	} 
 }
 
 pub struct Renderer {
@@ -64,6 +68,9 @@ impl Renderer {
 	}
 
 	fn draw_top_panel(&mut self, world: &World) {
+
+		self.top_panel.clear();
+
 		let mut y = 0;
 		for message in world.messages.iter() {
 			self.top_panel.con.print_ex(1, y, BackgroundFlag::None, TextAlignment::Left, message.as_slice());
