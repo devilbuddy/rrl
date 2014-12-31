@@ -9,11 +9,8 @@ pub enum KeyCode {
     Left,
     Right,
 
-    Shift,
-    ShiftUp,
-    ShiftDown,
-    ShiftLeft,
-    ShiftRight,
+    ToggleAim,
+    
 
     // Special
     Escape,
@@ -24,14 +21,9 @@ pub fn check_for_keypress() -> Option<KeyCode> {
     let flags = tcod::KEY_PRESSED;
     match Console::check_for_keypress(flags) {
         Some(key_state) => {
-            if key_state.shift {
-                match key_state.key {
-                    self::tcod::Key::Special(tcod::KeyCode::Up)     => Some(KeyCode::ShiftUp),
-                    self::tcod::Key::Special(tcod::KeyCode::Down)   => Some(KeyCode::ShiftDown),
-                    self::tcod::Key::Special(tcod::KeyCode::Left)   => Some(KeyCode::ShiftLeft),
-                    self::tcod::Key::Special(tcod::KeyCode::Right)  => Some(KeyCode::ShiftRight),
-                    _                                               => Some(KeyCode::Shift)
-                }
+            if key_state.shift || key_state.left_ctrl {
+                Some(KeyCode::ToggleAim)
+                
             } else {
                 match key_state.key {
                     self::tcod::Key::Special(tcod::KeyCode::Up)     => Some(KeyCode::Up),

@@ -7,7 +7,8 @@ use std::rand;
 
 pub struct Action {
 	move_action: Option<MoveAction>,
-	bump_action: Option<BumpAction>
+	bump_action: Option<BumpAction>,
+	fire_action: Option<FireAction>
 }
 
 struct MoveAction {
@@ -18,18 +19,32 @@ struct BumpAction {
 	position: Point
 }
 
+struct FireAction {
+	direction: Direction
+}
+
 impl Action {
 	pub fn make_move_action(position: &Point) -> Action {
 		Action{
 			move_action: Some(MoveAction {position: Point::new(position.x, position.y)}),
-			bump_action: None
+			bump_action: None,
+			fire_action: None
 		}
 	}
 
 	pub fn make_bump_action(position: &Point) -> Action {
 		Action {
 			move_action: None,
-			bump_action: Some(BumpAction {position: Point::new(position.x, position.y)})
+			bump_action: Some(BumpAction {position: Point::new(position.x, position.y)}),
+			fire_action: None
+		}
+	}
+
+	pub fn make_fire_action(direction: Direction) -> Action {
+		Action {
+			move_action: None,
+			bump_action: None,
+			fire_action: Some(FireAction {direction: direction})
 		}
 	}
 
@@ -47,25 +62,68 @@ impl Action {
 		// bump
 		if let Some(ref bump_action) = self.bump_action {
 			let mut target_died = false;
-
 			{
 				let cell = world.get_cell(bump_action.position.x, bump_action.position.y);	
 				match cell.actor {
 					Some(ref bump_target_actor_ref) => {
-						message = Some(format!("{} bumped by {}", bump_target_actor_ref.borrow().name.as_slice(), actor_ref.borrow().name.as_slice()));
 						let mut target = bump_target_actor_ref.borrow_mut();
+						let mut msg_string = format!("{} bumped by {}", target.name.as_slice(), actor_ref.borrow().name.as_slice());
+						
 						target.bumped_by(actor_ref);
 						target_died = !target.is_alive();
+
+						if target_died {
+							let die_message = format!(" - {} dies",  target.name.as_slice());
+							msg_string.push_str(die_message.as_slice());
+						}
+
+						message = Some(msg_string);
 					},
 					None => { assert!(false) }
 				}
 			}
 
 			if target_died {
+
 				world.remove_actor(&bump_action.position);
 			}
 		}
 		
+		if let Some(ref fire_action) = self.fire_action {
+			println!("fire");
+			let mut p = Point::new(0,0);
+			{
+				let actor = actor_ref.borrow();
+				p.set(actor.get_position());
+				p.translate(&fire_action.direction);
+			}
+
+			loop {
+				let mut done = false;
+
+				if(world.is_valid(&p)) {
+					let cell = world.get_cell(p.x, p.y);
+					if let Some(ref hit_actor_ref) = cell.actor {
+						let mut target = hit_actor_ref.borrow_mut();
+						let mut msg_string = format!("{} fired at {}", actor_ref.borrow().name.as_slice(), target.name.as_slice()); 
+						
+
+						message = Some(msg_string);
+						done = true;
+					}	
+				} else {
+					done = true;
+				}
+				
+				if done {
+					break;
+				} else {
+					p.translate(&fire_action.direction);
+				}
+			}
+			
+		}
+
 		// add action message
 		if let Some(message) = message {
     		world.add_message(message.as_slice());
@@ -102,13 +160,8 @@ impl Brain for PlayerBrain {
         			input::KeyCode::Down => { direction = Direction::South },
         			input::KeyCode::Left => { direction = Direction::West },
         			input::KeyCode::Right => { direction = Direction::East },
-        			input::KeyCode::ShiftUp => { println!("fire up");   },
-        			input::KeyCode::ShiftDown => { println!("fire down"); },
-        			input::KeyCode::ShiftLeft => { println!("fire left"); },
-        			input::KeyCode::ShiftRight => { println!("fire right"); },
-        			input::KeyCode::Shift => { 
-        				println!("shift"); 
-        				world.player_state.set_is_aiming(true);
+        			input::KeyCode::ToggleAim => { 
+        				world.player_state.toggle_aiming();
 						return None; 
         			},
         			_ => { return None; }
@@ -119,24 +172,28 @@ impl Brain for PlayerBrain {
 			}
         }
 
-        let mut position = Point::new(0,0);
-        {
-        	position.set(actor_ref.borrow().get_position());
-        }
-        position.translate(&direction);
-
-        if world.is_walkable(&position) {
-        	world.player_state.set_is_aiming(false);
-        	Some(Action::make_move_action(&position))	
+        if world.player_state.is_aiming {
+        	// fire
+        	return Some(Action::make_fire_action(direction));
         } else {
+        	// walk
+	        let mut position = Point::new(0,0);
+	        {
+	        	position.set(actor_ref.borrow().get_position());
+	        }
+	        position.translate(&direction);
 
-        	world.player_state.set_is_aiming(false);
-        	let cell = world.get_cell(position.x, position.y);
-        	if let Some(_) = cell.actor {
-        		return Some(Action::make_bump_action(&position))
-        	}
-        	None
+	        if world.is_walkable(&position) {
+	        	Some(Action::make_move_action(&position))	
+	        } else {
+				let cell = world.get_cell(position.x, position.y);
+	        	if let Some(_) = cell.actor {
+	        		return Some(Action::make_bump_action(&position))
+	        	}
+	        	None
+	        }	
         }
+        
 		
 	}
 }

@@ -54,8 +54,8 @@ pub struct PlayerState {
 }
 
 impl PlayerState {
-	pub fn set_is_aiming(&mut self, is_aiming: bool) {
-		self.is_aiming = is_aiming;
+	pub fn toggle_aiming(&mut self) {
+		self.is_aiming = !self.is_aiming;
 	}
 }
 
