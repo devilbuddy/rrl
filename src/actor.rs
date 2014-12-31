@@ -68,10 +68,8 @@ impl Action {
 					Some(ref bump_target_actor_ref) => {
 						let mut target = bump_target_actor_ref.borrow_mut();
 						let mut msg_string = format!("{} bumped by {}", target.name.as_slice(), actor_ref.borrow().name.as_slice());
-						
 						target.bumped_by(actor_ref);
 						target_died = !target.is_alive();
-
 						if target_died {
 							let die_message = format!(" - {} dies",  target.name.as_slice());
 							msg_string.push_str(die_message.as_slice());
@@ -102,7 +100,7 @@ impl Action {
 			loop {
 				let mut done = false;
 
-				if(world.is_valid(&p)) {
+				if world.is_valid(&p) {
 					let cell = world.get_cell(p.x, p.y);
 					if let Some(ref hit_actor_ref) = cell.actor {
 						let mut target = hit_actor_ref.borrow_mut();
@@ -165,7 +163,7 @@ impl Brain for PlayerBrain {
 	}
 
 	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
-		let mut direction = Direction::None;
+		let mut direction;
 		match input::check_for_keypress() {
 			Some(key_code) => {
 				match key_code {
@@ -210,7 +208,6 @@ impl Brain for PlayerBrain {
 		
 	}
 }
-
 
 struct MonsterBrain;
 

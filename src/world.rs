@@ -114,15 +114,17 @@ impl World {
 		}
 
 		if let Some(actor_ref) = self.to_act.pop_front() {
+			let mut actor_alive;
 			let mut action_option;
 			{
 				let actor = actor_ref.borrow();
-				if actor.is_alive() {
+				actor_alive = actor.is_alive();
+				
+				if actor_alive {
 					action_option = actor.brain.act(&actor_ref, self);	
 				} else {
 					action_option = None
 				}
-				
 			}
 	 		match action_option {
 	 			Some(action) => {
@@ -130,7 +132,7 @@ impl World {
 	 			},
 	 			None => {
 	 				// no action taken (player). check again next tick
-	 				if(actor_ref.borrow().is_alive()) {
+	 				if actor_alive {
 	 					self.to_act.push_front(actor_ref.clone());	
 	 				}
 	 			}
