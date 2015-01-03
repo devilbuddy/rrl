@@ -89,6 +89,22 @@ impl Action {
 
 		// move
 		if let Some(ref move_action) = self.move_action {
+			let mut picked_up_item = false;
+			{
+				let cell = world.get_cell(move_action.position.x, move_action.position.y);
+				if let Some(ref item_actor_ref) = cell.actor {
+					let mut target = item_actor_ref.borrow_mut();
+					target.walked_on_by(actor_ref);
+					let pick_up_message = format!("picked up {}", target.name);
+					message = Some(pick_up_message);
+					picked_up_item = true;
+				}	
+			}
+
+			if picked_up_item {
+				world.remove_actor(&move_action.position);
+			}
+
 			if world.is_walkable(&move_action.position) {
 				world.set_actor_position(actor_ref, &move_action.position);	
 			}
@@ -254,22 +270,36 @@ impl Brain for PlayerBrain {
 	}
 }
 
-struct MonsterBrain;
+enum MonsterState {
+	Passive,
+	Aggressive
+}
+
+struct MonsterBrain {
+	state: MonsterState
+}
 
 impl MonsterBrain {
 	pub fn new() -> MonsterBrain {
-		MonsterBrain
+		MonsterBrain{state: MonsterState::Passive}
 	}
 }
 
 impl Brain for MonsterBrain {
 	fn think(&self) -> bool {
-		
 		return true;
 	}
 
 	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
 
+		match self.state {
+			MonsterState::Passive => {
+
+			}
+			MonsterState::Aggressive => {
+
+			}
+		}
 
 		let distance_to_player =  actor_ref.borrow().position.distance_to(&world.get_player_position());
 		if distance_to_player < 10 {
@@ -410,6 +440,10 @@ impl Actor {
 
 	pub fn bumped_by(&mut self, actor_ref: &ActorRef) {
 		self.health -= 1;
+	}
+
+	pub fn walked_on_by(&mut self, actor_ref: &ActorRef) {
+		self.health = 0;
 	}
 
 	pub fn is_alive(&self) -> bool {
