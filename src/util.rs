@@ -1,5 +1,7 @@
 extern crate tcod;
 
+use std::num::SignedInt;
+
 pub enum Direction {
 	North,
 	East,
@@ -31,6 +33,12 @@ impl Point {
 			Direction::West => { self.x -= 1 },
 			_ => {}
 		}
+	}
+
+	pub fn distance_to(&self, other: &Point) -> uint {
+		let dx = (self.x - other.x) as int;
+		let dy = (self.y - other.y) as int;
+		return (dx.abs() + dy.abs()) as uint;
 	}
 
 }	

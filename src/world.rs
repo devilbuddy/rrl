@@ -183,6 +183,10 @@ impl World {
 		&self.grid[y][x]
 	}
 
+	pub fn get_player_position(&self) -> Point {
+		let player = self.player.borrow();
+		Point::new(player.position.x, player.position.y)
+	}
 
 	pub fn add_message(&mut self, message: &str) {
 		self.messages.push_back(String::from_str(message));

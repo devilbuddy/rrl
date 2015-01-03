@@ -260,43 +260,47 @@ impl MonsterBrain {
 	pub fn new() -> MonsterBrain {
 		MonsterBrain
 	}
-
-
-
 }
 
 impl Brain for MonsterBrain {
 	fn think(&self) -> bool {
+		
 		return true;
 	}
 
 	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
-		let mut direction = Direction::None;
-		match rand::random::<uint>()%4 {
-			0 => { direction = Direction::North },
-			1 => { direction = Direction::South },
-			2 => { direction = Direction::East },
-			3 => { direction = Direction::West }, 
-			_ => { }
+
+
+		let distance_to_player =  actor_ref.borrow().position.distance_to(&world.get_player_position());
+		if distance_to_player < 10 {
+			let mut direction = Direction::None;
+			match rand::random::<uint>()%4 {
+				0 => { direction = Direction::North },
+				1 => { direction = Direction::South },
+				2 => { direction = Direction::East },
+				3 => { direction = Direction::West }, 
+				_ => { }
+			}
+
+			let mut position = Point::new(0,0);
+			{
+	        	position.set(actor_ref.borrow().get_position());
+	        }
+	        position.translate(&direction);
+
+	        if world.is_walkable(&position) {
+	        	return Some(Action::make_move_action(&position));	
+	        } else {
+	        	let cell = world.get_cell(position.x, position.y);
+	        	if let Some(ref actor_ref) = cell.actor {
+	        		if actor_ref.borrow().is_player {
+	        			return Some(Action::make_bump_action(&position))	
+	        		}
+	        	} 
+	        	
+	        }
 		}
-
-		let mut position = Point::new(0,0);
-		{
-        	position.set(actor_ref.borrow().get_position());
-        }
-        position.translate(&direction);
-
-        if world.is_walkable(&position) {
-        	return Some(Action::make_move_action(&position));	
-        } else {
-        	let cell = world.get_cell(position.x, position.y);
-        	if let Some(ref actor_ref) = cell.actor {
-        		if actor_ref.borrow().is_player {
-        			return Some(Action::make_bump_action(&position))	
-        		}
-        	} 
-        	
-        }
+		
         return Some(Action::make_wait_action());
 	}
 }
