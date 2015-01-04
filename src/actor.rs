@@ -7,7 +7,7 @@ use std::rand;
 
 pub trait Brain {
 	fn think(&self) -> bool;
-	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action>;
+	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action>;
 }
 
 struct PlayerBrain;
@@ -25,7 +25,7 @@ impl Brain for PlayerBrain {
 		return true;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
+	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
 		let mut direction;
 		match input::check_for_keypress() {
 			Some(key_code) => {
@@ -51,21 +51,15 @@ impl Brain for PlayerBrain {
         	return Some(Action::make_fire_action(direction));
         } else {
         	// walk
-	        let mut position = Point::new(0,0);
-	        {
-	        	position.set(actor_ref.borrow().get_position());
-	        }
+	        let mut position = Point::new(current_position.x, current_position.y);
 	        position.translate(&direction);
 
 	        if world.is_walkable(&position) {
-	        	Some(Action::make_move_action(&position))	
-	        } else {
-				let cell = world.get_cell(position.x, position.y);
-	        	if let Some(_) = cell.actor {
-	        		return Some(Action::make_bump_action(&position))
-	        	}
-	        	None
-	        }	
+	        	return Some(Action::make_move_action(&position));	
+	        } else if world.is_bumpable(&position, false) {
+				return Some(Action::make_bump_action(&position));
+	        }
+	        None	
         }
         
 		
@@ -92,47 +86,30 @@ impl Brain for MonsterBrain {
 		return true;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
+	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
 
 		match self.state {
 			MonsterState::Passive => {
-
+				let distance_to_player =  current_position.distance_to(&world.get_player_position());
+				if distance_to_player < 10 {
+					self.state = MonsterState::Aggressive;
+				}
 			}
 			MonsterState::Aggressive => {
-
+				let from = Point::new(current_position.x, current_position.y);
+				let mut to = Point::new(0,0);
+				to.set(&world.get_player_position());
+				
+				if let Some(path) = world.find_path(&from, &to) {
+					if world.is_walkable(&path[0]) {
+						return Some(Action::make_move_action(&path[0]));
+					} else if world.is_bumpable(&path[0], true) {
+						return Some(Action::make_bump_action(&path[0]));
+			        }
+				}
 			}
 		}
 
-		let distance_to_player =  actor_ref.borrow().position.distance_to(&world.get_player_position());
-		if distance_to_player < 10 {
-			let mut direction = Direction::None;
-			match rand::random::<uint>()%4 {
-				0 => { direction = Direction::North },
-				1 => { direction = Direction::South },
-				2 => { direction = Direction::East },
-				3 => { direction = Direction::West }, 
-				_ => { }
-			}
-
-			let mut position = Point::new(0,0);
-			{
-	        	position.set(actor_ref.borrow().get_position());
-	        }
-	        position.translate(&direction);
-
-	        if world.is_walkable(&position) {
-	        	return Some(Action::make_move_action(&position));	
-	        } else {
-	        	let cell = world.get_cell(position.x, position.y);
-	        	if let Some(ref actor_ref) = cell.actor {
-	        		if actor_ref.borrow().is_player {
-	        			return Some(Action::make_bump_action(&position))	
-	        		}
-	        	} 
-	        	
-	        }
-		}
-		
         return Some(Action::make_wait_action());
 	}
 }
@@ -146,13 +123,11 @@ impl GeneratorBrain {
 
 impl Brain for GeneratorBrain {
 	fn think(&self) -> bool {
-		if rand::random::<uint>()%10 == 1 {
-			return true;
-		}
-		return false;
+		let should_spawn = rand::random::<uint>()%10 == 1;
+		return should_spawn;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
+	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
 		let mut direction = Direction::None;
 		match rand::random::<uint>()%4 {
 			0 => { direction = Direction::North },
@@ -162,11 +137,8 @@ impl Brain for GeneratorBrain {
 			_ => { }
 		}
 
-		let mut spawn_position = Point::new(0,0);
-		{
-        	spawn_position.set(actor_ref.borrow().get_position());
-        }
-        spawn_position.translate(&direction);
+		let mut spawn_position = Point::new(current_position.x, current_position.y);
+		spawn_position.translate(&direction);
 
         if world.is_walkable(&spawn_position) {
         	Some(Action::make_spawn_action(&spawn_position))
@@ -188,7 +160,8 @@ impl Brain for NoBrain {
 		return false;
 	}
 
-	fn act(&self, actor_ref: &ActorRef, world: &mut World) -> Option<Action> {
+	#[allow(unused_variables)]
+	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
 		None
 	}
 }
@@ -250,5 +223,9 @@ impl Actor {
 
 	pub fn is_alive(&self) -> bool {
 		return self.health > 0;
+	}
+
+	pub fn act(&mut self, world: &mut World) -> Option<Action> {
+		return self.brain.act(&self.position, world);
 	}
 }

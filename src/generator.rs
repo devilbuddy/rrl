@@ -104,7 +104,7 @@ pub fn generate(world: &mut World) {
 				}	
 			}
 		}
-		
+	
 		// random start positon
 		let index = rand::random::<uint>() % floors.len();
 		{

@@ -6,6 +6,9 @@ use actor::Actor;
 use std::cell::{RefCell};
 use std::rc::{Rc};
 use std::collections::RingBuf;
+use std::num::SignedInt;
+
+use tcod::AStarPath;
 
 pub type ActorRef = Rc<RefCell<Actor>>;
 
@@ -117,11 +120,11 @@ impl World {
 			let mut actor_alive;
 			let mut action_option;
 			{
-				let actor = actor_ref.borrow();
+				let mut actor = actor_ref.borrow_mut();
 				actor_alive = actor.is_alive();
 				
 				if actor_alive {
-					action_option = actor.brain.act(&actor_ref, self);	
+					action_option = actor.act(self);	
 				} else {
 					action_option = None
 				}
@@ -179,6 +182,19 @@ impl World {
 		return self.is_valid(p) && self.get_cell(p.x, p.y).is_walkable();
 	}
 
+	pub fn is_bumpable(&self, p: &Point, only_bump_player: bool) -> bool {
+		let cell = self.get_cell(p.x, p.y);
+    	if let Some(ref actor_ref) = cell.actor {
+    		if only_bump_player {
+    			return actor_ref.borrow().is_player;
+    		} else {
+    			return true;	
+    		}
+    	} else {
+    		return false;
+    	}
+	}
+
 	pub fn get_cell(&self, x: uint, y: uint) -> &Cell {
 		&self.grid[y][x]
 	}
@@ -193,6 +209,48 @@ impl World {
 		if self.messages.len() > 3 {
 			self.messages.pop_front();
 		}
+	}
+
+	pub fn find_path(&mut self, from_position: &Point, to_position: &Point) -> Option<Vec<Point>>{
+		println!("find path");
+
+		let diagonal_cost = 0.0;
+	    let w = self.width.clone() as int;
+	    let h = self.height.clone() as int;
+
+		let can_move = move |&mut: from: (int, int), to: (int, int)| -> f32 {
+	        let (fx, fy) = from;
+	        let (tx, ty) = to;
+
+	        let dx = (fx - tx).abs();
+	        let dy = (fy - ty).abs();
+
+	        let is_diagonal = false;
+
+	        if is_diagonal || self.get_cell(tx as uint,ty as uint).cell_type == CellType::Wall {
+	        	0.0
+	        } else {
+	        	1.0
+	        }
+	        
+	    };
+	    
+	   	let mut pathfinder = AStarPath::new_from_callback(w, h, can_move, diagonal_cost);
+	    let found_path = pathfinder.find((from_position.x as int, from_position.y as int), (to_position.x as int, to_position.y as int));
+		if found_path {
+			println!("found path: {}", found_path);
+			let mut path_vector = Vec::new();
+
+			for pos in pathfinder.walk() {
+				let (x, y) = pos;
+		        path_vector.push(Point::new(x as uint, y as uint));
+		    }
+
+			Some(path_vector)
+		} else {
+			None
+		}
+	    
 	}
 
 }
