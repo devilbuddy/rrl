@@ -6,7 +6,6 @@ use actor::Actor;
 use std::cell::{RefCell};
 use std::rc::{Rc};
 use std::collections::RingBuf;
-use std::num::SignedInt;
 
 use tcod::AStarPath;
 
@@ -211,28 +210,23 @@ impl World {
 		}
 	}
 
+	#[allow(unused_variables)]
 	pub fn find_path(&mut self, from_position: &Point, to_position: &Point) -> Option<Vec<Point>>{
 		println!("find path");
 
 		let diagonal_cost = 0.0;
-	    let w = self.width.clone() as int;
-	    let h = self.height.clone() as int;
+	    let w = self.width as int;
+	    let h = self.height as int;
 
+		
 		let can_move = move |&mut: from: (int, int), to: (int, int)| -> f32 {
-	        let (fx, fy) = from;
 	        let (tx, ty) = to;
 
-	        let dx = (fx - tx).abs();
-	        let dy = (fy - ty).abs();
-
-	        let is_diagonal = false;
-
-	        if is_diagonal || self.get_cell(tx as uint,ty as uint).cell_type == CellType::Wall {
+	        if self.get_cell(tx as uint,ty as uint).cell_type == CellType::Wall {
 	        	0.0
 	        } else {
 	        	1.0
 	        }
-	        
 	    };
 	    
 	   	let mut pathfinder = AStarPath::new_from_callback(w, h, can_move, diagonal_cost);

@@ -128,14 +128,7 @@ impl Brain for GeneratorBrain {
 	}
 
 	fn act(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
-		let mut direction = Direction::None;
-		match rand::random::<uint>()%4 {
-			0 => { direction = Direction::North },
-			1 => { direction = Direction::South },
-			2 => { direction = Direction::East },
-			3 => { direction = Direction::West }, 
-			_ => { }
-		}
+		let direction = Direction::random_direction();
 
 		let mut spawn_position = Point::new(current_position.x, current_position.y);
 		spawn_position.translate(&direction);

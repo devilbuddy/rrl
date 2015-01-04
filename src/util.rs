@@ -1,13 +1,25 @@
 extern crate tcod;
 
+use std::rand;
 use std::num::SignedInt;
 
 pub enum Direction {
 	North,
 	East,
 	South,
-	West,
-	None
+	West
+}
+
+impl Direction {
+	pub fn random_direction() -> Direction {
+		match rand::random::<uint>()%4 {
+			0 => { Direction::North },
+			1 => { Direction::South },
+			2 => { Direction::East },
+			3 => { Direction::West }, 
+			_ => { panic!() }
+		}
+	}	
 }
 
 pub struct Point {
@@ -31,7 +43,6 @@ impl Point {
 			Direction::East => { self.x += 1 },
 			Direction::South => { self.y += 1 },
 			Direction::West => { self.x -= 1 },
-			_ => {}
 		}
 	}
 
