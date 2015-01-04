@@ -3,13 +3,14 @@ use tcod::{Console};
 
 mod util;
 mod actor;
+mod action;
 mod world;
 mod generator;
 mod renderer;
 mod input;
 
 fn main() {
-	
+
 	println!("main");
 
 	let w = 80;
