@@ -247,12 +247,9 @@ impl World {
 
 	#[allow(unused_variables)]
 	pub fn find_path(&mut self, from_position: &Point, to_position: &Point) -> Option<Vec<Point>>{
-		println!("find path");
-
 		let diagonal_cost = 0.0;
 	    let w = self.width as int;
 	    let h = self.height as int;
-
 		
 		let can_move = move |&mut: from: (int, int), to: (int, int)| -> f32 {
 	        let (tx, ty) = to;
@@ -267,14 +264,11 @@ impl World {
 	   	let mut pathfinder = AStarPath::new_from_callback(w, h, can_move, diagonal_cost);
 	    let found_path = pathfinder.find((from_position.x as int, from_position.y as int), (to_position.x as int, to_position.y as int));
 		if found_path {
-			println!("found path: {}", found_path);
 			let mut path_vector = Vec::new();
-
 			for pos in pathfinder.walk() {
 				let (x, y) = pos;
 		        path_vector.push(Point::new(x as uint, y as uint));
 		    }
-
 			Some(path_vector)
 		} else {
 			None

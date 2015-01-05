@@ -10,6 +10,8 @@ pub enum Direction {
 	West
 }
 
+static DIRECTIONS: [Direction, ..4] = [Direction::North, Direction::South, Direction::East, Direction::West];
+
 impl Direction {
 	pub fn random_direction() -> Direction {
 		match rand::random::<uint>()%4 {
@@ -52,6 +54,16 @@ impl Point {
 		return (dx.abs() + dy.abs()) as uint;
 	}
 
+	pub fn is_adjacent_to(&self, other: &Point) -> bool {
+		for dir in DIRECTIONS.iter() {
+		    let mut p = Point::new(self.x, self.y);
+		    p.translate(dir);
+		    if p.x == other.x && p.y == other.y {
+		    	return true;
+		    }
+		}
+		return false;
+	}
 }	
 
 pub struct Color {
@@ -68,7 +80,7 @@ impl Color {
 	pub fn panel_green() -> Color { Color {r:76, g:153, b:0} }
 	pub fn light_blue() -> Color { Color {r:0, g:102, b:204} }
 	pub fn white() -> Color { Color {r:255, g:255, b:255} }
-	
+
 	pub fn to_tcod_color(&self) -> tcod::Color {
 		tcod::Color::new(self.r, self.g, self.b)
 	}

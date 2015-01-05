@@ -10,11 +10,8 @@ pub enum KeyCode {
     Right,
 
     ToggleAim,
-    
 
-    // Special
     Escape,
-
 }
 
 pub fn check_for_keypress() -> Option<KeyCode> {

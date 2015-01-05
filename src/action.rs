@@ -2,6 +2,9 @@ use util::{Point, Direction};
 use world::{World, ActorRef};
 use actor::Actor;
 
+static BUMP_DAMAGE : int = 1;
+static FIRE_DAMAGE : int = 3;
+
 pub struct Action {
 	wait_action: Option<WaitAction>,
 	spawn_action: Option<SpawnAction>,
@@ -120,7 +123,7 @@ impl Action {
 					Some(ref bump_target_actor_ref) => {
 						let mut target = bump_target_actor_ref.borrow_mut();
 						let mut msg_string = format!("{} attacks {}", actor_ref.borrow().name.as_slice(), target.name.as_slice());
-						target.bumped_by(actor_ref);
+						target.damaged(BUMP_DAMAGE);
 						target_died = !target.is_alive();
 						if target_died {
 							let die_message = format!(" - {} dies",  target.name.as_slice());
@@ -162,7 +165,7 @@ impl Action {
 						let mut target = hit_actor_ref.borrow_mut();
 						let mut msg_string = format!("{} fires at {}", actor_ref.borrow().name.as_slice(), target.name.as_slice()); 
 						
-						target.bumped_by(actor_ref);
+						target.damaged(FIRE_DAMAGE);
 						target_died = !target.is_alive();
 
 						if target_died {

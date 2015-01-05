@@ -1,7 +1,7 @@
 rrl
 ===
 
-rust roguelike expermient using tcod-rs (https://github.com/tomassedovic/tcod-rs)
+rust roguelike experiment using tcod-rs (https://github.com/tomassedovic/tcod-rs)
 
 ![](https://github.com/devilbuddy/rrl/blob/master/mayhem1.png)
 

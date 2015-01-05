@@ -1,5 +1,5 @@
 use util::{Point, Color, Direction};
-use world::{World, ActorRef};
+use world::{World};
 use input;
 use action::Action;
 
@@ -98,6 +98,17 @@ impl MonsterBrain {
 		return self.path.len() > 0;
 	}
 
+	fn walk_random(&mut self, current_position: &Point, world: &mut World) -> Option<Action> {
+		let mut next = Point::new(current_position.x, current_position.y);
+		next.translate(&Direction::random_direction());
+		if world.is_walkable(&next) {
+			return Some(Action::make_move_action(&next));
+		} else if world.is_bumpable(&next, true) {
+			return Some(Action::make_bump_action(&next));
+        } else {
+        	return Some(Action::make_wait_action());
+        }
+	}
 }
 
 impl Brain for MonsterBrain {
@@ -109,13 +120,19 @@ impl Brain for MonsterBrain {
 
 		match self.state {
 			MonsterState::Passive => {
-				//let distance_to_player =  current_position.distance_to(&world.get_player_position());
-				//if distance_to_player < 10 {
+				let distance_to_player =  current_position.distance_to(&world.get_player_position());
+				if distance_to_player < 20 {
 					self.state = MonsterState::Aggressive;
-				//}
+				} else {
+					return self.walk_random(current_position, world);
+				}
 			}
 			MonsterState::Aggressive => {
-				
+				// attack if possible
+				if current_position.is_adjacent_to(&world.get_player_position()) {
+					return Some(Action::make_bump_action(&world.get_player_position()));
+				}
+
 				if !self.has_path() {
 					let from = Point::new(current_position.x, current_position.y);
 					let mut to = Point::new(0,0);
@@ -131,21 +148,21 @@ impl Brain for MonsterBrain {
 					}
 				} 
 				
-				let mut next = Point::new(0,0);
 				if self.has_path() {
 					if let Some(p) = self.path.pop_front() {
-						next.set(&p);	
+						if world.is_walkable(&p) {
+						return Some(Action::make_move_action(&p));
+						} else if world.is_bumpable(&p, true) {
+							return Some(Action::make_bump_action(&p));
+				        }	
 					}
+					
 				} else if self.stuck_on_path_count > 3 {
-					next.set(current_position);
-					next.translate(&Direction::random_direction());
+					self.path.clear();
+					return self.walk_random(current_position, world);
 				}
 				
-				if world.is_walkable(&next) {
-					return Some(Action::make_move_action(&next));
-				} else if world.is_bumpable(&next, true) {
-					return Some(Action::make_bump_action(&next));
-		        }
+				
 				
 			}
 		}
@@ -206,7 +223,7 @@ pub struct Actor {
     pub name : String,
     pub is_player : bool,
     pub is_solid : bool,
-    pub health: uint,
+    pub health: int,
     pub brain : Box<Brain + 'static>
 }
 
@@ -226,15 +243,41 @@ impl Actor {
 	}
 
 	pub fn kobold() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), name: "Kobold".to_string(), is_player: false, is_solid : true, health: 1, brain: box MonsterBrain::new()}
+		Actor {
+			position: Point::new(0,0), 
+			glyph: 'k', 
+			color: Color::green(), 
+			name: "Kobold".to_string(), 
+			is_player: false, 
+			is_solid: true, 
+			health: 2, 
+			brain: box MonsterBrain::new()
+		}
 	}
 
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'G', color: Color::purple(), name: "Kobold generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box GeneratorBrain::new()}	
+		Actor { 
+			position: Point::new(0,0), 
+			glyph: 'G', 
+			color: Color::purple(), 
+			name: "Kobold generator".to_string(),  
+			is_player: false, 
+			is_solid: true, 
+			health: 5, 
+			brain: box GeneratorBrain::new()
+		}	
 	}
 
 	pub fn ammo_crate() -> Actor {
-		Actor {position: Point::new(0,0), glyph: '*', color: Color::light_blue(), name: "Ammo crate".to_string(), is_player: false, is_solid : false, health: 1, brain: box NoBrain::new()}	
+		Actor {
+			position: Point::new(0,0), 
+			glyph: '*', 
+			color: Color::light_blue(), 
+			name: "Ammo crate".to_string(), 
+			is_player: false, 
+			is_solid: false, 
+			health: 1, 
+			brain: box NoBrain::new()}	
 	}
 
 	pub fn get_position(&self) -> &Point {
@@ -246,8 +289,8 @@ impl Actor {
 		self.position.y = position.y;
 	}
 
-	pub fn bumped_by(&mut self, actor_ref: &ActorRef) {
-		self.health -= 1;
+	pub fn damaged(&mut self, damage: int) {
+		self.health -= damage;
 	}
 
 	pub fn is_alive(&self) -> bool {
