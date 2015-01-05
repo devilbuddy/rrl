@@ -29,6 +29,7 @@ impl Panel {
 
 pub struct Renderer {
 	width: uint,
+	height: uint,
     con: Console,
     top_panel: Panel,
     bottom_panel: Panel
@@ -44,6 +45,7 @@ impl Renderer {
 		let window_height = height + panel_height + panel_height;
 		Renderer {
 			width: width,
+			height: height,
 			con: Console::init_root(width as int, window_height as int, title, false),
 			top_panel: top_panel, 
 			bottom_panel: bottom_panel
@@ -88,9 +90,18 @@ impl Renderer {
 		self.flush();
 	}
 
+	pub fn draw_game_over(&mut self) {
+		let x = self.width as int / 2;
+		let y = self.height as int /2;
+		self.con.set_default_foreground(util::Color::red().to_tcod_color());
+		self.con.print_ex(x, y, BackgroundFlag::None, TextAlignment::Center, "[GAME OVER]"); 
+		self.con.set_default_foreground(util::Color::white().to_tcod_color());
+		self.flush();
+	}
+
 	fn draw_title_actor_description(&mut self, x: int, y: int, actor: Actor) {
 		self.con.put_char_ex(x, y, actor.glyph, actor.color.to_tcod_color(), util::Color::black().to_tcod_color());
-		self.con.print_ex(x + 2, y , BackgroundFlag::None, TextAlignment::Left, 	actor.name.as_slice());
+		self.con.print_ex(x + 2, y , BackgroundFlag::None, TextAlignment::Left, actor.name.as_slice());
 
 	}
 

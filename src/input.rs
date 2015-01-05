@@ -43,5 +43,12 @@ pub fn check_for_keypress() -> Option<KeyCode> {
 }
 
 pub fn wait_for_any_key() {
-    Console::wait_for_keypress(true);
+    let mut pressed = false; 
+    while !pressed {
+        let keypress = Console::wait_for_keypress(true);
+        if keypress.pressed {
+            pressed = true;
+        }
+    }
+    
 }

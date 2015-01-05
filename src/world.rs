@@ -103,6 +103,10 @@ impl World {
 			}
 	} 
 
+	pub fn is_game_over(&self) -> bool {
+		return self.player.borrow().is_alive();
+	}
+
 	pub fn tick(&mut self) {
 
 		if self.to_act.is_empty() {

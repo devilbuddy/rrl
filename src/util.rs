@@ -67,7 +67,8 @@ impl Color {
 	pub fn purple() -> Color { Color {r:160, g: 32, b: 240} }
 	pub fn panel_green() -> Color { Color {r:76, g:153, b:0} }
 	pub fn light_blue() -> Color { Color {r:0, g:102, b:204} }
-
+	pub fn white() -> Color { Color {r:255, g:255, b:255} }
+	
 	pub fn to_tcod_color(&self) -> tcod::Color {
 		tcod::Color::new(self.r, self.g, self.b)
 	}

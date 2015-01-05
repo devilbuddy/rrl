@@ -11,8 +11,7 @@ mod input;
 
 enum State {
 	Title,
-	Game,
-	GameOver
+	Game
 }
 
 fn main() {
@@ -41,11 +40,17 @@ fn main() {
 				renderer.draw_world(&world);
     		},
     		State::Game => {
-    			world.tick();
+    			let game_over = world.is_game_over();
+    			if !game_over {
+    				world.tick();	
+    			}
     			renderer.draw_world(&world);
-    		}
-    		State::GameOver => {
 
+    			if game_over {
+    				renderer.draw_game_over();
+    				input::wait_for_any_key();
+    				state = State::Title;
+    			}
     		}
     	}
     	

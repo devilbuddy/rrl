@@ -190,7 +190,7 @@ impl Actor {
 	}
 
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), name: "Kobold generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box GeneratorBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: 'G', color: Color::purple(), name: "Kobold generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box GeneratorBrain::new()}	
 	}
 
 	pub fn ammo_crate() -> Actor {
