@@ -28,6 +28,7 @@ impl Panel {
 }
 
 pub struct Renderer {
+	width: uint,
     con: Console,
     top_panel: Panel,
     bottom_panel: Panel
@@ -41,8 +42,56 @@ impl Renderer {
 		let bottom_panel = Panel::new(0, 0, width, panel_height + height, util::Color::panel_green(), util::Color::black());
 
 		let window_height = height + panel_height + panel_height;
-		Renderer {con: Console::init_root(width as int, window_height as int, title, false),
-				  top_panel: top_panel, bottom_panel: bottom_panel}
+		Renderer {
+			width: width,
+			con: Console::init_root(width as int, window_height as int, title, false),
+			top_panel: top_panel, 
+			bottom_panel: bottom_panel
+		}
+	}
+
+	pub fn draw_title(&mut self) {
+		self.con.clear();
+
+		let mut y = 5;
+		let x = self.width as int / 2;
+		let alignment = TextAlignment::Center;
+
+		self.con.print_ex(x, y, BackgroundFlag::None, alignment,		"#    #  ####  #####   ####  #      #####  "); 
+		self.con.print_ex(x, y + 1, BackgroundFlag::None, alignment, 	"#   #  #    # #    # #    # #      #    # ");
+		self.con.print_ex(x, y + 2, BackgroundFlag::None, alignment, 	"####   #    # #####  #    # #      #    # ");
+		self.con.print_ex(x, y + 3, BackgroundFlag::None, alignment, 	"#  #   #    # #    # #    # #      #    # ");
+		self.con.print_ex(x, y + 4, BackgroundFlag::None, alignment, 	"#   #  #    # #    # #    # #      #    # ");
+		self.con.print_ex(x, y + 5, BackgroundFlag::None, alignment, 	"#    #  ####  #####   ####  ###### #####  ");
+		self.con.print_ex(x, y + 6, BackgroundFlag::None, alignment, 	"                                          ");
+		self.con.print_ex(x, y + 7, BackgroundFlag::None, alignment, 	"#    #   ##   #   # #    # ###### #    #  ");
+		self.con.print_ex(x, y + 8, BackgroundFlag::None, alignment, 	"##  ##  #  #   # #  #    # #      ##  ##  ");
+		self.con.print_ex(x, y + 9, BackgroundFlag::None, alignment, 	"# ## # #    #   #   ###### #####  # ## #  ");
+		self.con.print_ex(x, y + 10, BackgroundFlag::None, alignment, 	"#    # ######   #   #    # #      #    #  ");
+		self.con.print_ex(x, y + 11, BackgroundFlag::None, alignment, 	"#    # #    #   #   #    # #      #    #  ");
+		self.con.print_ex(x, y + 12, BackgroundFlag::None, alignment, 	"#    # #    #   #   #    # ###### #    #  ");
+	
+		y += 15;
+		self.con.print_ex(x, y, BackgroundFlag::None, alignment, 	"Arrow keys to move/fire");
+		self.con.print_ex(x, y + 1, BackgroundFlag::None, alignment, 	"Shift - toggle walk/aim");
+
+		y += 4;
+
+		self.draw_title_actor_description(30, y, Actor::player());
+		self.draw_title_actor_description(30, y + 1, Actor::kobold());
+		self.draw_title_actor_description(30, y + 2, Actor::kobold_generator());
+		self.draw_title_actor_description(30, y + 3, Actor::ammo_crate());
+
+		y += 6;
+		self.con.print_ex(x, y, BackgroundFlag::None, alignment, 	"[ Press any key to start ]");
+
+		self.flush();
+	}
+
+	fn draw_title_actor_description(&mut self, x: int, y: int, actor: Actor) {
+		self.con.put_char_ex(x, y, actor.glyph, actor.color.to_tcod_color(), util::Color::black().to_tcod_color());
+		self.con.print_ex(x + 2, y , BackgroundFlag::None, TextAlignment::Left, 	actor.name.as_slice());
+
 	}
 
 	pub fn draw_world(&mut self, world: &World) {
@@ -78,7 +127,10 @@ impl Renderer {
 		}
 		
 		Console::blit(&self.top_panel.con, // source console
-						self.top_panel.x as int, self.top_panel.y as int , self.top_panel.width as int, self.top_panel.height as int, // source 
+						self.top_panel.x as int, 
+						self.top_panel.y as int, 
+						self.top_panel.width as int, 
+						self.top_panel.height as int, // source 
 						&mut self.con, // dest console 
 						0, 0, 
 						1f32, 
@@ -105,7 +157,10 @@ impl Renderer {
 		self.bottom_panel.con.print_ex(37, 1, BackgroundFlag::None, TextAlignment::Left, player_state.kills.to_string().as_slice());
 
 		Console::blit(&self.bottom_panel.con, // source console
-						self.bottom_panel.x as int, self.bottom_panel.y as int , self.bottom_panel.width as int, self.bottom_panel.height as int, // source 
+						self.bottom_panel.x as int, 
+						self.bottom_panel.y as int , 
+						self.bottom_panel.width as int, 
+						self.bottom_panel.height as int, // source 
 						&mut self.con, // dest console 
 						0, 50 + self.top_panel.height as int, 
 						1f32, 

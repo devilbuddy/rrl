@@ -177,7 +177,7 @@ impl Actor {
 			position: Point::new(0,0), 
 			glyph: '@', 
 			color: Color::red(), 
-			name: "player".to_string(),
+			name: "Player".to_string(),
 			is_player: true, 
 			is_solid : true, 
 			health: 100, 
@@ -186,15 +186,15 @@ impl Actor {
 	}
 
 	pub fn kobold() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), name: "kobold".to_string(), is_player: false, is_solid : true, health: 1, brain: box MonsterBrain::new()}
+		Actor {position: Point::new(0,0), glyph: 'k', color: Color::green(), name: "Kobold".to_string(), is_player: false, is_solid : true, health: 1, brain: box MonsterBrain::new()}
 	}
 
 	pub fn kobold_generator() -> Actor {
-		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), name: "generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box GeneratorBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: 'O', color: Color::purple(), name: "Kobold generator".to_string(),  is_player: false, is_solid : true, health: 1, brain: box GeneratorBrain::new()}	
 	}
 
 	pub fn ammo_crate() -> Actor {
-		Actor {position: Point::new(0,0), glyph: '*', color: Color::light_blue(), name: "ammo crate".to_string(), is_player: false, is_solid : false, health: 1, brain: box NoBrain::new()}	
+		Actor {position: Point::new(0,0), glyph: '*', color: Color::light_blue(), name: "Ammo crate".to_string(), is_player: false, is_solid : false, health: 1, brain: box NoBrain::new()}	
 	}
 
 	pub fn get_position(&self) -> &Point {

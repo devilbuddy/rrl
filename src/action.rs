@@ -92,7 +92,7 @@ impl Action {
 				if let Some(ref item_actor_ref) = cell.actor {
 					let mut target = item_actor_ref.borrow_mut();
 					target.walked_on_by(actor_ref);
-					let pick_up_message = format!("picked up {}", target.name);
+					let pick_up_message = format!("Picked up {}", target.name);
 					message = Some(pick_up_message);
 					picked_up_item = true;
 				}	

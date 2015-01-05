@@ -42,3 +42,6 @@ pub fn check_for_keypress() -> Option<KeyCode> {
 
 }
 
+pub fn wait_for_any_key() {
+    Console::wait_for_keypress(true);
+}
