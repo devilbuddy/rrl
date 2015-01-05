@@ -11,7 +11,7 @@ pub fn generate(world: &mut World) {
 
 		// http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels#C_Code
 
-		world.actors.clear();
+		world.cleanup();
 		world.actors.push(*world.player.clone());
 
 		let fill_prob = 40;

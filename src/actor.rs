@@ -4,6 +4,7 @@ use input;
 use action::Action;
 
 use std::rand;
+use std::collections::RingBuf;
 
 pub trait Brain {
 	fn think(&self) -> bool;
@@ -48,7 +49,14 @@ impl Brain for PlayerBrain {
 
         if world.player_state.is_aiming {
         	// fire
-        	return Some(Action::make_fire_action(direction));
+        	if world.has_ammo() {
+        		world.decrease_ammo();
+        		return Some(Action::make_fire_action(direction));	
+        	} else {
+        		world.add_message("Out of ammo!");
+        		None	
+        	}
+        	
         } else {
         	// walk
 	        let mut position = Point::new(current_position.x, current_position.y);
@@ -72,13 +80,24 @@ enum MonsterState {
 }
 
 struct MonsterBrain {
-	state: MonsterState
+	state: MonsterState,
+	path: RingBuf<Point>,
+	stuck_on_path_count: uint
 }
 
 impl MonsterBrain {
 	pub fn new() -> MonsterBrain {
-		MonsterBrain{state: MonsterState::Passive}
+		MonsterBrain {
+			state: MonsterState::Passive,
+			path: RingBuf::new(),
+			stuck_on_path_count: 0
+		}
 	}
+
+	pub fn has_path(&self) -> bool {
+		return self.path.len() > 0;
+	}
+
 }
 
 impl Brain for MonsterBrain {
@@ -90,23 +109,44 @@ impl Brain for MonsterBrain {
 
 		match self.state {
 			MonsterState::Passive => {
-				let distance_to_player =  current_position.distance_to(&world.get_player_position());
-				if distance_to_player < 10 {
+				//let distance_to_player =  current_position.distance_to(&world.get_player_position());
+				//if distance_to_player < 10 {
 					self.state = MonsterState::Aggressive;
-				}
+				//}
 			}
 			MonsterState::Aggressive => {
-				let from = Point::new(current_position.x, current_position.y);
-				let mut to = Point::new(0,0);
-				to.set(&world.get_player_position());
 				
-				if let Some(path) = world.find_path(&from, &to) {
-					if world.is_walkable(&path[0]) {
-						return Some(Action::make_move_action(&path[0]));
-					} else if world.is_bumpable(&path[0], true) {
-						return Some(Action::make_bump_action(&path[0]));
-			        }
+				if !self.has_path() {
+					let from = Point::new(current_position.x, current_position.y);
+					let mut to = Point::new(0,0);
+					to.set(&world.get_player_position());
+					
+					if let Some(path) = world.find_path(&from, &to) {
+						for p in path.into_iter() {
+							self.path.push_back(p);	    
+						}
+						self.stuck_on_path_count = 0;
+					} else {
+						self.stuck_on_path_count += 1;
+					}
+				} 
+				
+				let mut next = Point::new(0,0);
+				if self.has_path() {
+					if let Some(p) = self.path.pop_front() {
+						next.set(&p);	
+					}
+				} else if self.stuck_on_path_count > 3 {
+					next.set(current_position);
+					next.translate(&Direction::random_direction());
 				}
+				
+				if world.is_walkable(&next) {
+					return Some(Action::make_move_action(&next));
+				} else if world.is_bumpable(&next, true) {
+					return Some(Action::make_bump_action(&next));
+		        }
+				
 			}
 		}
 
@@ -180,7 +220,7 @@ impl Actor {
 			name: "Player".to_string(),
 			is_player: true, 
 			is_solid : true, 
-			health: 100, 
+			health: 10, 
 			brain: box PlayerBrain::new()
 		}
 	}
@@ -208,10 +248,6 @@ impl Actor {
 
 	pub fn bumped_by(&mut self, actor_ref: &ActorRef) {
 		self.health -= 1;
-	}
-
-	pub fn walked_on_by(&mut self, actor_ref: &ActorRef) {
-		self.health = 0;
 	}
 
 	pub fn is_alive(&self) -> bool {

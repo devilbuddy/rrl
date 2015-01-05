@@ -149,6 +149,7 @@ impl Renderer {
 	}
 
 	fn draw_bottom_panel(&mut self, world: &World) {
+		self.bottom_panel.clear();
 
 		let player = world.player.borrow();
 		let player_state = &world.player_state;

@@ -86,19 +86,23 @@ impl Action {
 
 		// move
 		if let Some(ref move_action) = self.move_action {
-			let mut picked_up_item = false;
+			let mut picked_up_ammo = false;
 			{
 				let cell = world.get_cell(move_action.position.x, move_action.position.y);
 				if let Some(ref item_actor_ref) = cell.actor {
 					let mut target = item_actor_ref.borrow_mut();
-					target.walked_on_by(actor_ref);
+					target.health = 0;
+
 					let pick_up_message = format!("Picked up {}", target.name);
 					message = Some(pick_up_message);
-					picked_up_item = true;
+					picked_up_ammo = true;
 				}	
 			}
 
-			if picked_up_item {
+			if picked_up_ammo {
+				if actor_ref.borrow().is_player {
+					world.increase_ammo(5);
+				}
 				world.remove_actor(&move_action.position);
 			}
 
@@ -115,7 +119,7 @@ impl Action {
 				match cell.actor {
 					Some(ref bump_target_actor_ref) => {
 						let mut target = bump_target_actor_ref.borrow_mut();
-						let mut msg_string = format!("{} bumped by {}", target.name.as_slice(), actor_ref.borrow().name.as_slice());
+						let mut msg_string = format!("{} attacks {}", actor_ref.borrow().name.as_slice(), target.name.as_slice());
 						target.bumped_by(actor_ref);
 						target_died = !target.is_alive();
 						if target_died {
@@ -131,12 +135,16 @@ impl Action {
 
 			if target_died {
 				world.remove_actor(&bump_action.position);
+				if actor_ref.borrow().is_player {
+					world.increase_kills();
+				}
 			}
 		}
 		
 
 		// fire 
 		if let Some(ref fire_action) = self.fire_action {
+
 			let mut target_died = false;
 			let mut bullet_position = Point::new(0,0);
 			{
@@ -152,7 +160,7 @@ impl Action {
 					let cell = world.get_cell(bullet_position.x, bullet_position.y);
 					if let Some(ref hit_actor_ref) = cell.actor {
 						let mut target = hit_actor_ref.borrow_mut();
-						let mut msg_string = format!("{} fired at {}", actor_ref.borrow().name.as_slice(), target.name.as_slice()); 
+						let mut msg_string = format!("{} fires at {}", actor_ref.borrow().name.as_slice(), target.name.as_slice()); 
 						
 						target.bumped_by(actor_ref);
 						target_died = !target.is_alive();
@@ -178,9 +186,10 @@ impl Action {
 
 			if target_died {
 				world.remove_actor(&bullet_position);
+				if actor_ref.borrow().is_player {
+					world.increase_kills();
+				}
 			}
-
-			
 		}
 
 		// spawn

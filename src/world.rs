@@ -56,9 +56,17 @@ pub struct PlayerState {
 }
 
 impl PlayerState {
+	pub fn reset(&mut self) {
+		self.ammo = 0;
+		self.kills = 0;
+		self.is_aiming = false;
+	}
+
 	pub fn toggle_aiming(&mut self) {
 		self.is_aiming = !self.is_aiming;
 	}
+
+
 }
 
 pub struct World {
@@ -103,8 +111,31 @@ impl World {
 			}
 	} 
 
+	pub fn cleanup(&mut self) {
+
+		self.actors.clear();
+		self.player.borrow_mut().health = 10;
+		self.player_state.reset();
+	}
+
 	pub fn is_game_over(&self) -> bool {
-		return self.player.borrow().is_alive();
+		return !self.player.borrow().is_alive();
+	}
+
+	pub fn increase_kills(&mut self) {
+		self.player_state.kills += 1;
+	}
+
+	pub fn has_ammo(&self) -> bool {
+		return self.player_state.ammo > 0;
+	}
+
+	pub fn decrease_ammo(&mut self) {
+		self.player_state.ammo -= 1;
+	}
+
+	pub fn increase_ammo(&mut self, amount: uint) {
+		self.player_state.ammo += amount;
 	}
 
 	pub fn tick(&mut self) {
