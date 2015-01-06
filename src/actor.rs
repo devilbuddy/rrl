@@ -133,6 +133,12 @@ impl Brain for MonsterBrain {
 					return Some(Action::make_bump_action(&world.get_player_position()));
 				}
 
+				// re-calculate path more often when close to player
+				let distance_to_player =  current_position.distance_to(&world.get_player_position());
+				if distance_to_player < 4 {
+					self.path.clear();
+				}
+
 				if !self.has_path() {
 					let from = Point::new(current_position.x, current_position.y);
 					let mut to = Point::new(0,0);
@@ -157,7 +163,7 @@ impl Brain for MonsterBrain {
 				        }	
 					}
 					
-				} else if self.stuck_on_path_count > 3 {
+				} else if self.stuck_on_path_count > 2 {
 					self.path.clear();
 					return self.walk_random(current_position, world);
 				}

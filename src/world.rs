@@ -47,6 +47,11 @@ impl Cell {
 			_ => { return false; }
 		}
 	}
+
+	pub fn clear(&mut self) {
+		self.actor = None;
+	}
+
 }
 
 pub struct PlayerState {
@@ -114,6 +119,11 @@ impl World {
 	pub fn cleanup(&mut self) {
 
 		self.actors.clear();
+		for y in range (0, self.height) {
+			for x in range(0, self.width) {
+				self.grid[y][x].clear();
+			}
+		}
 		self.player.borrow_mut().health = 10;
 		self.player_state.reset();
 	}
