@@ -10,7 +10,7 @@ pub enum KeyCode {
     Right,
 
     ToggleAim,
-
+    Wait,
     Escape,
 }
 
@@ -28,6 +28,7 @@ pub fn check_for_keypress() -> Option<KeyCode> {
                     self::tcod::Key::Special(tcod::KeyCode::Left)   => Some(KeyCode::Left),
                     self::tcod::Key::Special(tcod::KeyCode::Right)  => Some(KeyCode::Right),
                     self::tcod::Key::Special(tcod::KeyCode::Escape) => Some(KeyCode::Escape),
+                    self::tcod::Key::Printable('w')                 => Some(KeyCode::Wait),
                     _                                               => None
                 } 
             }

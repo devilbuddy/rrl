@@ -39,6 +39,7 @@ impl Brain for PlayerBrain {
         				world.player_state.toggle_aiming();
 						return None; 
         			},
+        			input::KeyCode::Wait => { return Some(Action::make_wait_action())},
         			_ => { return None; }
 				}
 			},

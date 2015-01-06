@@ -76,8 +76,9 @@ impl Renderer {
 		y += 15;
 		self.con.print_ex(x, y, BackgroundFlag::None, alignment, 	"Arrow keys to move/fire");
 		self.con.print_ex(x, y + 1, BackgroundFlag::None, alignment, 	"Shift - toggle walk/aim");
+		self.con.print_ex(x, y + 2, BackgroundFlag::None, alignment, 	"w - wait turn");
 
-		y += 4;
+		y += 5;
 
 		self.draw_title_actor_description(30, y, Actor::player());
 		self.draw_title_actor_description(30, y + 1, Actor::kobold());
